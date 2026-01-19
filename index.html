@@ -198,48 +198,63 @@
         // Soporta múltiples cajas con la misma imagen usando imageMapping
 
         // Lista de números de paquete
-        const packingLists = [
-            "CMEX-001",
-            "CMEX-002",
-            "CMEX-003",
-            "CMEX-004",
-            "CMEX-005",
-            "CMEX-006",
-            "CMEX-007",
-            "CMEX-008",
-            "CMEX-009",
-            "CMEX-010"
-            // Agregue más números de paquete
-        ];
+       const packingLists = [
+    "CMEX-001",
+    "CMEX-002",
+    "CMEX-003",
+    "CMEX-004",
+    "CMEX-005",
+    "CMEX-006",
+    "CMEX-007",
+    "CMEX-008",
+    "CMEX-009",
+    "CMEX-010",
+    "CMEX-011",
+    "CMEX-012",
+    "CMEX-013",
+    "CMEX-014",
+    "CMEX-015",
+    "CMEX-016",
+    "CMEX-017",
+    "CMEX-018",
+    "CMEX-019",
+    "CMEX-020"
+];
 
-        // Mapeo de imágenes - Permite múltiples cajas con la misma imagen
-        // Formato: "número-caja": "nombre-archivo"
-        // Si no se encuentra en el mapeo, se usa el número de caja
-        const imageMapping = {
-            // Ejemplo: CMEX-001 a CMEX-010 usan la misma imagen
-            "CMEX-001": "CMEX-001",
-            "CMEX-002": "CMEX-001",  // Usa imagen de CMEX-001
-            "CMEX-003": "CMEX-001",  // Usa imagen de CMEX-001
-            "CMEX-004": "CMEX-001",  // Usa imagen de CMEX-001
-            "CMEX-005": "CMEX-001",  // Usa imagen de CMEX-001
-            "CMEX-006": "CMEX-006",  // Usa su propia imagen
-            "CMEX-007": "CMEX-006",  // Usa imagen de CMEX-006
-            "CMEX-008": "CMEX-006",  // Usa imagen de CMEX-006
-            "CMEX-009": "CMEX-009",  // Usa su propia imagen
-            "CMEX-010": "CMEX-009"   // Usa imagen de CMEX-009
-        };
+// Mapeo de producto (Caja -> Código de Producto)
+// 20 cajas, 4 productos únicos
+const productMapping = {
+    "CMEX-001": "1169",  // Producto: 1169
+    "CMEX-002": "1169",  // Producto: 1169
+    "CMEX-003": "1169",  // Producto: 1169
+    "CMEX-004": "1169",  // Producto: 1169
+    "CMEX-005": "1169",  // Producto: 1169
+    "CMEX-006": "9902",  // Producto: 9902
+    "CMEX-007": "9902",  // Producto: 9902
+    "CMEX-008": "9902",  // Producto: 9902
+    "CMEX-009": "9902",  // Producto: 9902
+    "CMEX-010": "9902",  // Producto: 9902
+    "CMEX-011": "8001",  // Producto: 8001
+    "CMEX-012": "8001",  // Producto: 8001
+    "CMEX-013": "8001",  // Producto: 8001
+    "CMEX-014": "8001",  // Producto: 8001
+    "CMEX-015": "8001",  // Producto: 8001
+    "CMEX-016": "8860",  // Producto: 8860
+    "CMEX-017": "8860",  // Producto: 8860
+    "CMEX-018": "8860",  // Producto: 8860
+    "CMEX-019": "8860",  // Producto: 8860
+    "CMEX-020": "8860"  // Producto: 8860
+};
 
-        // Mapeo de producto (Caja -> Código de Producto) - Nueva función
-        // Formato: "número-caja": "código-producto"
-        // Si existe productMapping, tiene prioridad sobre imageMapping
-        const productMapping = {
-            // Ejemplo: CMEX-001 a CMEX-003 son producto 1169
-            // "CMEX-001": "1169",  // Usa imagen 1169.jpg
-            // "CMEX-002": "1169",  // Usa imagen 1169.jpg
-            // "CMEX-003": "1169",  // Usa imagen 1169.jpg
-            // "CMEX-004": "1170",  // Usa imagen 1170.jpg
-            // "CMEX-005": "1170"   // Usa imagen 1170.jpg
-        };
+// Nota: Solo necesita preparar las imágenes de los productos (4 imágenes):
+// - 1169.jpg  (Cajas: CMEX-001 ~ CMEX-005)
+// - 9902.jpg  (Cajas: CMEX-006 ~ CMEX-010)
+// - 8001.jpg  (Cajas: CMEX-011 ~ CMEX-015)
+// - 8860.jpg  (Cajas: CMEX-016 ~ CMEX-020)
+
+// Ejemplo de uso:
+// Si la caja CMEX-001 mapea al producto 1169,
+// se mostrará la imagen: https://github.com/huamaohuanyu/packinglist-system/raw/main/images/1169.jpg
 
         // ============================================
         // Código del Programa (No es necesario modificar)
