@@ -198,7 +198,7 @@
         // Soporta múltiples cajas con la misma imagen usando imageMapping
 
         // Lista de números de paquete
-      const packingLists = [
+     const packingLists = [
     "CMEX-001",
     "CMEX-002",
     "CMEX-003",
@@ -221,35 +221,30 @@
     "CMEX-020"
 ];
 
-// Mapeo de producto (Caja -> Código de Producto)
-// 优先级: productMapping > imageMapping > 箱子号
-// 20 cajas, 4 productos únicos
 const productMapping = {
-    "CMEX-001": "1169",  // Producto: 1169
-    "CMEX-002": "1169",  // Producto: 1169
-    "CMEX-003": "1169",  // Producto: 1169
-    "CMEX-004": "1169",  // Producto: 1169
-    "CMEX-005": "1169",  // Producto: 1169
-    "CMEX-006": "9902",  // Producto: 9902
-    "CMEX-007": "9902",  // Producto: 9902
-    "CMEX-008": "9902",  // Producto: 9902
-    "CMEX-009": "9902",  // Producto: 9902
-    "CMEX-010": "9902",  // Producto: 9902
-    "CMEX-011": "8001",  // Producto: 8001
-    "CMEX-012": "8001",  // Producto: 8001
-    "CMEX-013": "8001",  // Producto: 8001
-    "CMEX-014": "8001",  // Producto: 8001
-    "CMEX-015": "8001",  // Producto: 8001
-    "CMEX-016": "8860",  // Producto: 8860
-    "CMEX-017": "8860",  // Producto: 8860
-    "CMEX-018": "8860",  // Producto: 8860
-    "CMEX-019": "8860",  // Producto: 8860
-    "CMEX-020": "8860"  // Producto: 8860
+    "CMEX-001": "1169",
+    "CMEX-002": "1169",
+    "CMEX-003": "1169",
+    "CMEX-004": "1169",
+    "CMEX-005": "1169",
+    "CMEX-006": "9902",
+    "CMEX-007": "9902",
+    "CMEX-008": "9902",
+    "CMEX-009": "9902",
+    "CMEX-010": "9902",
+    "CMEX-011": "8001",
+    "CMEX-012": "8001",
+    "CMEX-013": "8001",
+    "CMEX-014": "8001",
+    "CMEX-015": "8001",
+    "CMEX-016": "8860",
+    "CMEX-017": "8860",
+    "CMEX-018": "8860",
+    "CMEX-019": "8860",
+    "CMEX-020": "8860"
 };
 
-// ⚠️⚠️⚠️ 重要：这一行必须复制！清空 imageMapping 避免冲突
 const imageMapping = {};
-
 
 
         // ============================================
