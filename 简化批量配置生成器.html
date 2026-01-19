@@ -348,6 +348,40 @@
         // 存储产品批次
         let productBatches = [];
 
+        // 本地存储键名
+        const STORAGE_KEY_BATCHES = 'packinglist_batches';
+        const STORAGE_KEY_PRODUCT_BATCHES = 'packinglist_product_batches';
+
+        // 保存配置到本地存储
+        function saveToLocalStorage() {
+            try {
+                localStorage.setItem(STORAGE_KEY_BATCHES, JSON.stringify(batches));
+                localStorage.setItem(STORAGE_KEY_PRODUCT_BATCHES, JSON.stringify(productBatches));
+            } catch (e) {
+                console.warn('保存到本地存储失败:', e);
+            }
+        }
+
+        // 从本地存储加载配置
+        function loadFromLocalStorage() {
+            try {
+                const savedBatches = localStorage.getItem(STORAGE_KEY_BATCHES);
+                const savedProductBatches = localStorage.getItem(STORAGE_KEY_PRODUCT_BATCHES);
+
+                if (savedBatches) {
+                    batches = JSON.parse(savedBatches);
+                    updateBatchList();
+                }
+
+                if (savedProductBatches) {
+                    productBatches = JSON.parse(savedProductBatches);
+                    updateProductBatchList();
+                }
+            } catch (e) {
+                console.warn('从本地存储加载失败:', e);
+            }
+        }
+
         // 从文本生成配置
         function generateFromText() {
             const input = document.getElementById('boxNumbersInput').value.trim();
@@ -399,6 +433,7 @@
             });
 
             updateBatchList();
+            saveToLocalStorage();  // 自动保存到本地存储
             generateConfigWithMapping(boxNumbers, imageMapping.mapping, imageMapping.mappingTypeDescription);
             alert(`成功生成 ${boxNumbers.length} 个箱子配置！只需 ${imageMapping.uniqueImages} 张图片！`);
         }
@@ -624,6 +659,7 @@
             if (confirm('确定要删除这个批次吗？')) {
                 batches.splice(index, 1);
                 updateBatchList();
+                saveToLocalStorage();  // 自动保存到本地存储
             }
         }
 
@@ -632,6 +668,7 @@
             if (confirm('确定要清空所有批次吗？')) {
                 batches = [];
                 updateBatchList();
+                saveToLocalStorage();  // 自动保存到本地存储
             }
         }
 
@@ -801,6 +838,9 @@
 
         // 监听映射类型变化，显示/隐藏对应设置
         document.addEventListener('DOMContentLoaded', function() {
+            // 页面加载时从本地存储恢复配置
+            loadFromLocalStorage();
+
             const mappingTypeSelect = document.getElementById('imageMappingType');
             const manualSettings = document.getElementById('manualMappingSettings');
             const groupSettings = document.getElementById('imageGroupSettings');
@@ -956,6 +996,7 @@
             });
 
             updateProductBatchList();
+            saveToLocalStorage();  // 自动保存到本地存储
             alert(`已添加批次：产品 ${productCode}，${boxCount} 箱（${boxPrefix}${String(startNum).padStart(digits, '0')} ~ ${boxPrefix}${String(endNum).padStart(digits, '0')}）`);
         }
 
@@ -1002,6 +1043,7 @@
             if (confirm('确定要删除这个批次吗？')) {
                 productBatches.splice(index, 1);
                 updateProductBatchList();
+                saveToLocalStorage();  // 自动保存到本地存储
             }
         }
 
@@ -1010,6 +1052,7 @@
             if (confirm('确定要清空所有批次吗？')) {
                 productBatches = [];
                 updateProductBatchList();
+                saveToLocalStorage();  // 自动保存到本地存储
             }
         }
 
