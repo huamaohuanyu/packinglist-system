@@ -1,166 +1,354 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>装箱单查看系统</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>装箱单查询系统</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             padding: 20px;
         }
+
         .container {
             background: white;
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 800px;
             width: 100%;
-            max-width: 500px;
-            overflow: hidden;
-        }
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
             text-align: center;
         }
-        .header h1 {
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 32px;
+        }
+
+        .box-info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
             font-size: 24px;
-            margin-bottom: 10px;
+            font-weight: bold;
         }
-        .header .box-info {
-            background: rgba(255,255,255,0.2);
-            padding: 8px 15px;
-            border-radius: 20px;
-            display: inline-block;
-            font-size: 14px;
-        }
-        .content {
-            padding: 40px;
-        }
+
         .input-group {
-            margin-bottom: 25px;
+            margin: 20px 0;
+            text-align: center;
         }
+
         .input-group label {
             display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 600;
-        }
-        .input-group input {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #e1e5e9;
-            border-radius: 10px;
+            margin-bottom: 10px;
+            color: #666;
             font-size: 16px;
+        }
+
+        input {
+            padding: 15px;
+            font-size: 18px;
+            width: 300px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            outline: none;
             transition: border-color 0.3s;
         }
-        .input-group input:focus {
-            outline: none;
+
+        input:focus {
             border-color: #667eea;
         }
-        .btn {
-            width: 100%;
-            padding: 16px;
+
+        button {
+            padding: 15px 40px;
+            font-size: 18px;
+            cursor: pointer;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
             border-radius: 10px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 20px;
+            transition: transform 0.2s;
         }
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+
+        button:hover {
+            transform: scale(1.05);
         }
-        .btn:active {
-            transform: translateY(0);
+
+        .message {
+            margin: 20px 0;
+            font-size: 16px;
         }
+
         .error {
-            color: #ff4757;
-            text-align: center;
-            margin-top: 15px;
-            display: none;
+            color: #e74c3c;
+            background: #fee;
+            padding: 15px;
+            border-radius: 10px;
         }
+
+        .loading {
+            color: #667eea;
+            background: #eef;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .success {
+            color: #27ae60;
+            background: #efe;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
         .image-container {
-            display: none;
             margin-top: 30px;
-            text-align: center;
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            background: #f9f9f9;
         }
+
         .image-container img {
             max-width: 100%;
-            border: 1px solid #ddd;
+            height: auto;
             border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-        .hidden {
-            display: none;
-        }
-        .loading {
-            text-align: center;
+
+        .info-section {
+            margin-top: 30px;
+            text-align: left;
+            background: #f9f9f9;
             padding: 20px;
-            display: none;
+            border-radius: 10px;
         }
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+
+        .info-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+
+        .info-section p {
+            margin: 10px 0;
+            color: #666;
+        }
+
+        .info-section .label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            input {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .box-info {
+                font-size: 20px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>📦 装箱单查看系统</h1>
-            <div class="box-info" id="boxInfo">正在识别箱子信息...</div>
+        <h1>📦 装箱单查询系统</h1>
+        
+        <!-- 箱号信息区域（自动显示） -->
+        <div class="box-info" id="boxInfo">
+            正在加载箱号信息...
         </div>
         
-        <div class="content">
-            <!-- 密码输入区域 -->
-            <div id="passwordSection">
-                <div class="input-group">
-                    <label for="password">请输入查看密码：</label>
-                    <input type="password" id="password" placeholder="输入密码后按回车或点击确认">
-                </div>
-                <button class="btn" onclick="checkPassword()">确认查看</button>
-                <div class="error" id="errorMsg">密码错误，请重新输入</div>
-            </div>
-            
-            <!-- 加载动画 -->
-            <div class="loading" id="loading">
-                <div class="spinner"></div>
-                <p>正在加载装箱单...</p>
-            </div>
-            
-            <!-- 图片显示区域 -->
-            <div class="image-container" id="imageContainer">
-                <img id="packingImage" src="" alt="装箱单">
-                <div style="margin-top: 15px; color: #666; font-size: 14px;">
-                    图片加载完成，您可以长按保存或截图
-                </div>
-            </div>
+        <!-- 密码输入区域 -->
+        <div class="input-group">
+            <label for="password">请输入访问密码</label>
+            <input 
+                type="password" 
+                id="password" 
+                placeholder="输入密码"
+                onkeypress="handleKeyPress(event)"
+            >
         </div>
+        
+        <button onclick="verifyPassword()">查看装箱单</button>
+        
+        <div id="message" class="message"></div>
+        
+        <!-- 图片显示区域 -->
+        <div id="imageContainer" class="image-container" style="display: none;"></div>
+        
+        <!-- 详细信息区域 -->
+        <div id="infoSection" class="info-section" style="display: none;"></div>
     </div>
-    
-    <script src="script.js"></script>
+
+    <script>
+        // ============================================
+        // 配置区域 - 你需要修改这里的数据
+        // ============================================
+        
+        // 访问密码（修改这里即可更改密码）
+        const ACCESS_PASSWORD = "123456";
+        
+        // 装箱单数据配置
+        // 注意：imageUrl 是你在 GitHub 仓库中上传图片后的实际链接
+        // 你可以从 GitHub 复制图片链接，然后替换下面的示例链接
+        const packingLists = [
+            {
+                boxNumber: "BOX-001",
+                imageUrl: "https://github.com/你的用户名/packinglist-system/raw/main/images/BOX-001.jpg",
+                productList: "货号A×100, 货号B×50",
+                shipDate: "2026-01-19",
+                totalWeight: "25.5kg",
+                notes: "易碎品，请轻拿轻放"
+            },
+            {
+                boxNumber: "BOX-002",
+                imageUrl: "https://github.com/你的用户名/packinglist-system/raw/main/images/BOX-002.jpg",
+                productList: "货号C×80, 货号D×120",
+                shipDate: "2026-01-19",
+                totalWeight: "30.2kg",
+                notes: "保持干燥"
+            },
+            {
+                boxNumber: "BOX-003",
+                imageUrl: "https://github.com/你的用户名/packinglist-system/raw/main/images/BOX-003.jpg",
+                productList: "货号E×150",
+                shipDate: "2026-01-19",
+                totalWeight: "20.8kg",
+                notes: ""
+            }
+            // 添加更多箱子，复制上面的格式即可
+        ];
+        
+        // ============================================
+        // 程序代码（不需要修改）
+        // ============================================
+        
+        // 当前箱子数据
+        let currentBox = null;
+        
+        // 页面加载完成后执行
+        window.onload = function() {
+            // 从 URL 中获取箱号
+            const urlParams = new URLSearchParams(window.location.search);
+            const boxNumber = urlParams.get('box');
+            
+            if (boxNumber) {
+                // 查找对应箱子的数据
+                currentBox = packingLists.find(box => box.boxNumber === boxNumber);
+                
+                if (currentBox) {
+                    // 显示箱号信息
+                    document.getElementById('boxInfo').textContent = `📦 ${currentBox.boxNumber}`;
+                    document.getElementById('boxInfo').style.background = 'linear-gradient(135deg, #27ae60 0%, #2ecc71 100%)';
+                } else {
+                    // 箱号不存在
+                    document.getElementById('boxInfo').textContent = `❌ 未找到箱号: ${boxNumber}`;
+                    document.getElementById('boxInfo').style.background = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)';
+                    document.getElementById('message').innerHTML = '<p class="error">无效的箱号，请联系发货方</p>';
+                }
+            } else {
+                // 没有提供箱号
+                document.getElementById('boxInfo').textContent = '❌ 未提供箱号';
+                document.getElementById('boxInfo').style.background = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)';
+                document.getElementById('message').innerHTML = '<p class="error">请扫描正确的二维码</p>';
+            }
+        };
+        
+        // 处理回车键
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                verifyPassword();
+            }
+        }
+        
+        // 验证密码
+        function verifyPassword() {
+            const passwordInput = document.getElementById('password');
+            const password = passwordInput.value.trim();
+            const messageDiv = document.getElementById('message');
+            const imageContainer = document.getElementById('imageContainer');
+            const infoSection = document.getElementById('infoSection');
+            
+            // 清空之前的内容
+            messageDiv.innerHTML = '';
+            imageContainer.style.display = 'none';
+            imageContainer.innerHTML = '';
+            infoSection.style.display = 'none';
+            infoSection.innerHTML = '';
+            
+            // 检查是否找到箱子
+            if (!currentBox) {
+                messageDiv.innerHTML = '<p class="error">无效的箱号，请联系发货方</p>';
+                return;
+            }
+            
+            // 检查密码
+            if (password === '') {
+                messageDiv.innerHTML = '<p class="error">请输入密码</p>';
+                return;
+            }
+            
+            if (password !== ACCESS_PASSWORD) {
+                messageDiv.innerHTML = '<p class="error">密码错误，请重新输入</p>';
+                passwordInput.value = ''; // 清空密码输入框
+                passwordInput.focus(); // 聚焦到密码输入框
+                return;
+            }
+            
+            // 密码正确，显示装箱单
+            messageDiv.innerHTML = '<p class="success">✅ 密码正确，正在加载装箱单...</p>';
+            
+            // 显示图片
+            setTimeout(() => {
+                messageDiv.innerHTML = '';
+                
+                // 显示装箱单图片
+                imageContainer.style.display = 'block';
+                imageContainer.innerHTML = `
+                    <img 
+                        src="${currentBox.imageUrl}" 
+                        alt="${currentBox.boxNumber}" 
+                        onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE2IiBmaWxsPSIjOTk5Ij7ogY7liLDmlrDliIblj7fwn548L3RleHQ+PC9zdmc+'; 
+                        this.alt='图片加载失败';"
+                    />
+                `;
+                
+                // 显示详细信息（可选，因为图片已经包含所有信息）
+                infoSection.style.display = 'block';
+                infoSection.innerHTML = `
+                    <h3>📋 箱号信息</h3>
+                    <p><span class="label">箱号：</span>${currentBox.boxNumber}</p>
+                    ${currentBox.shipDate ? `<p><span class="label">发货日期：</span>${currentBox.shipDate}</p>` : ''}
+                    ${currentBox.totalWeight ? `<p><span class="label">总重量：</span>${currentBox.totalWeight}</p>` : ''}
+                    ${currentBox.notes ? `<p><span class="label">备注：</span>${currentBox.notes}</p>` : ''}
+                `;
+                
+            }, 500); // 延迟 500ms 显示，让用户看到成功提示
+        }
+    </script>
 </body>
 </html>
