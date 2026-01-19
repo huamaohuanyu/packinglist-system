@@ -193,12 +193,13 @@
         const GITHUB_BASE_URL = `https://github.com/${GITHUB_USERNAME}/${GITHUB_REPO}/raw/${GITHUB_BRANCH}/images/`;
 
         // Configuración de Datos de Lista de Empaque
-        // Formato del enlace de imagen: GITHUB_BASE_URL + número de paquete + ".jpg"
+        // Soporta múltiples formatos de imagen: jpg, jpeg, png, webp
+        // Ignora mayúsculas y minúsculas en el número de paquete
         // Ejemplo: GITHUB_BASE_URL + "CMEX-001" + ".jpg"
         const packingLists = [
             {
                 boxNumber: "CMEX-001",
-                imageUrl: GITHUB_BASE_URL + "CMEX-001.jpg",
+                imageUrl: GITHUB_BASE_URL + "CMEX-001.jpg",  // Cambiar extensión según formato: .jpg, .jpeg, .png, .webp
                 productList: "Producto A×100, Producto B×50",
                 shipDate: "2026-01-19",
                 totalWeight: "25.5kg",
@@ -224,7 +225,7 @@
             // Por ejemplo:
             // {
             //     boxNumber: "CMEX-004",
-            //     imageUrl: GITHUB_BASE_URL + "CMEX-004.jpg",
+            //     imageUrl: GITHUB_BASE_URL + "CMEX-004.jpg",  // O .png, .jpeg, .webp según formato
             //     productList: "Producto F×200",
             //     shipDate: "2026-01-19",
             //     totalWeight: "15.0kg",
@@ -243,15 +244,21 @@
         window.onload = function() {
             // Obtener número de paquete de la URL
             const urlParams = new URLSearchParams(window.location.search);
-            const boxNumber = urlParams.get('box');
+            let boxNumber = urlParams.get('box');
+
+            // Convertir a mayúsculas para ignorar mayúsculas/minúsculas
+            if (boxNumber) {
+                boxNumber = boxNumber.toUpperCase();
+            }
 
             // Depuración: Mostrar el número de paquete recibido
             console.log('Número de paquete recibido:', boxNumber);
+            console.log('Número de paquete original (URL):', urlParams.get('box'));
             console.log('Lista de paquetes disponibles:', packingLists.map(b => b.boxNumber));
 
             if (boxNumber) {
-                // Buscar datos del paquete correspondiente
-                currentBox = packingLists.find(box => box.boxNumber === boxNumber);
+                // Buscar datos del paquete correspondiente (ignorando mayúsculas/minúsculas)
+                currentBox = packingLists.find(box => box.boxNumber.toUpperCase() === boxNumber);
 
                 if (currentBox) {
                     // Mostrar información del paquete
