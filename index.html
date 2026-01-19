@@ -198,21 +198,7 @@
         // Soporta múltiples cajas con la misma imagen usando imageMapping
 
         // Lista de números de paquete
-        // ══════════════════════════════════════════════════
-// 产品货号映射配置
-// 生成时间: 2026/1/20 01:50:10
-// ══════════════════════════════════════════════════
-
-// ============================================
-// ⚠️ 重要提示：请完整复制以下全部代码（3部分）
-// ============================================
-// 第1部分: packingLists (箱子列表)
-// 第2部分: productMapping (产品货号映射)
-// 第3部分: imageMapping = {} (清空图片映射，必须包含！)
-// ============================================
-
-// Lista de números de paquete
-const packingLists = [
+      const packingLists = [
     "CMEX-001",
     "CMEX-002",
     "CMEX-003",
@@ -222,12 +208,22 @@ const packingLists = [
     "CMEX-007",
     "CMEX-008",
     "CMEX-009",
-    "CMEX-010"
+    "CMEX-010",
+    "CMEX-011",
+    "CMEX-012",
+    "CMEX-013",
+    "CMEX-014",
+    "CMEX-015",
+    "CMEX-016",
+    "CMEX-017",
+    "CMEX-018",
+    "CMEX-019",
+    "CMEX-020"
 ];
 
 // Mapeo de producto (Caja -> Código de Producto)
 // 优先级: productMapping > imageMapping > 箱子号
-// 10 cajas, 2 productos únicos
+// 20 cajas, 4 productos únicos
 const productMapping = {
     "CMEX-001": "1169",  // Producto: 1169
     "CMEX-002": "1169",  // Producto: 1169
@@ -238,31 +234,22 @@ const productMapping = {
     "CMEX-007": "9902",  // Producto: 9902
     "CMEX-008": "9902",  // Producto: 9902
     "CMEX-009": "9902",  // Producto: 9902
-    "CMEX-010": "9902"  // Producto: 9902
+    "CMEX-010": "9902",  // Producto: 9902
+    "CMEX-011": "8001",  // Producto: 8001
+    "CMEX-012": "8001",  // Producto: 8001
+    "CMEX-013": "8001",  // Producto: 8001
+    "CMEX-014": "8001",  // Producto: 8001
+    "CMEX-015": "8001",  // Producto: 8001
+    "CMEX-016": "8860",  // Producto: 8860
+    "CMEX-017": "8860",  // Producto: 8860
+    "CMEX-018": "8860",  // Producto: 8860
+    "CMEX-019": "8860",  // Producto: 8860
+    "CMEX-020": "8860"  // Producto: 8860
 };
 
 // ⚠️⚠️⚠️ 重要：这一行必须复制！清空 imageMapping 避免冲突
 const imageMapping = {};
 
-// ============================================
-// 步骤2: 准备产品图片
-// ============================================
-// 只需要准备以下 2 张产品图片：
-// - 1169.jpg  (Cajas: CMEX-001 ~ CMEX-005)
-// - 9902.jpg  (Cajas: CMEX-006 ~ CMEX-010)
-
-// ============================================
-// 步骤3: 上传图片到 GitHub
-// ============================================
-// 1. 访问: https://github.com/huamaohuanyu/packinglist-system/tree/main/images
-// 2. 上传上述 2 张图片到 images 文件夹
-// 3. 确保图片文件名与 productMapping 中的货号完全一致（区分大小写）
-
-// ============================================
-// 调试信息
-// ============================================
-// 图片URL格式: https://github.com/huamaohuanyu/packinglist-system/raw/main/images/[产品货号].jpg
-// 例如: https://github.com/huamaohuanyu/packinglist-system/raw/main/images/1169.jpg
 
 
         // ============================================
