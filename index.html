@@ -215,30 +215,34 @@
         // Mapeo de imágenes - Permite múltiples cajas con la misma imagen
         // Formato: "número-caja": "nombre-archivo"
         // Si no se encuentra en el mapeo, se usa el número de caja
+        // ⚠️ 重要: 如果使用 productMapping，请保持 imageMapping 为空对象 {}
         const imageMapping = {
             // Ejemplo: CMEX-001 a CMEX-010 usan la misma imagen
-            "CMEX-001": "CMEX-001",
-            "CMEX-002": "CMEX-001",  // Usa imagen de CMEX-001
-            "CMEX-003": "CMEX-001",  // Usa imagen de CMEX-001
-            "CMEX-004": "CMEX-001",  // Usa imagen de CMEX-001
-            "CMEX-005": "CMEX-001",  // Usa imagen de CMEX-001
-            "CMEX-006": "CMEX-006",  // Usa su propia imagen
-            "CMEX-007": "CMEX-006",  // Usa imagen de CMEX-006
-            "CMEX-008": "CMEX-006",  // Usa imagen de CMEX-006
-            "CMEX-009": "CMEX-009",  // Usa su propia imagen
-            "CMEX-010": "CMEX-009"   // Usa imagen de CMEX-009
+            // 注意: 以下是示例配置,实际使用时请通过配置生成器生成
+            // "CMEX-001": "CMEX-001",
+            // "CMEX-002": "CMEX-001",  // Usa imagen de CMEX-001
+            // "CMEX-003": "CMEX-001",  // Usa imagen de CMEX-001
+            // "CMEX-004": "CMEX-001",  // Usa imagen de CMEX-001
+            // "CMEX-005": "CMEX-001",  // Usa imagen de CMEX-001
+            // "CMEX-006": "CMEX-006",  // Usa su propia imagen
+            // "CMEX-007": "CMEX-006",  // Usa imagen de CMEX-006
+            // "CMEX-008": "CMEX-006",  // Usa imagen de CMEX-006
+            // "CMEX-009": "CMEX-009",  // Usa su propia imagen
+            // "CMEX-010": "CMEX-009"   // Usa imagen de CMEX-009
         };
 
         // Mapeo de producto (Caja -> Código de Producto) - Nueva función
         // Formato: "número-caja": "código-producto"
         // Si existe productMapping, tiene prioridad sobre imageMapping
+        // ⚠️ 使用说明: 请通过配置生成器生成 productMapping 配置
+        // 生成后请同时复制 packingLists, productMapping 和 imageMapping = {}
         const productMapping = {
             // Ejemplo: CMEX-001 a CMEX-003 son producto 1169
-             "CMEX-001": "1169",  // Usa imagen 1169.jpg
-             "CMEX-002": "1169",  // Usa imagen 1169.jpg
-             "CMEX-003": "1169",  // Usa imagen 1169.jpg
-             "CMEX-004": "1170",  // Usa imagen 1170.jpg
-             "CMEX-005": "1170"   // Usa imagen 1170.jpg
+            // "CMEX-001": "1169",  // Usa imagen 1169.jpg
+            // "CMEX-002": "1169",  // Usa imagen 1169.jpg
+            // "CMEX-003": "1169",  // Usa imagen 1169.jpg
+            // "CMEX-004": "1170",  // Usa imagen 1170.jpg
+            // "CMEX-005": "1170"   // Usa imagen 1170.jpg
         };
 
         // ============================================
@@ -260,6 +264,7 @@
             console.warn('⚠️ 警告: productMapping 和 imageMapping 同时存在！');
             console.warn('⚠️ 系统将优先使用 productMapping（产品货号映射）');
             console.warn('⚠️ 如需使用 imageMapping，请将 productMapping 设为空对象: const productMapping = {};');
+            console.warn('⚠️ 建议检查是否从配置生成器复制了完整代码（需要同时复制 imageMapping = {}）');
         }
 
         if (hasProductMapping) {
@@ -271,6 +276,13 @@
         } else {
             console.log('✅ 当前模式: 默认模式（箱子号）');
             console.log('✅ 示例: CMEX-001 -> CMEX-001 (将显示 CMEX-001.jpg)');
+        }
+
+        // 额外检查：如果两个映射都为空，提示用户使用配置生成器
+        if (!hasProductMapping && !hasImageMapping) {
+            console.warn('💡 提示: 当前没有配置任何映射');
+            console.warn('💡 建议: 使用简化批量配置生成器生成配置代码');
+            console.warn('💡 访问: 简化批量配置生成器.html');
         }
 
         console.log('═══════════════════════════════════════');
@@ -351,6 +363,10 @@
 
         // Ejecutar cuando la página carga
         window.onload = function() {
+            console.log('═══════════════════════════════════════');
+            console.log('📦 页面加载初始化');
+            console.log('═══════════════════════════════════════');
+
             // 验证配置
             validateConfiguration();
 
@@ -364,9 +380,11 @@
             }
 
             // Depuración: Mostrar el número de paquete recibido
-            console.log('Número de paquete recibido:', boxNumber);
-            console.log('Número de paquete original (URL):', urlParams.get('box'));
-            console.log('Lista de paquetes disponibles:', packingLists);
+            console.log('🔍 URL参数 box:', urlParams.get('box'));
+            console.log('🔍 转换后箱号:', boxNumber);
+            console.log('🔍 packingLists 数量:', packingLists.length);
+            console.log('🔍 packingLists 内容:', packingLists);
+            console.log('🔍 当前URL:', window.location.href);
 
             if (boxNumber) {
                 // Buscar datos del paquete correspondiente (ignorando mayúsculas/minúsculas)
@@ -376,21 +394,25 @@
                     // Mostrar información del paquete
                     document.getElementById('boxInfo').textContent = `📦 ${currentBox}`;
                     document.getElementById('boxInfo').style.background = 'linear-gradient(135deg, #27ae60 0%, #2ecc71 100%)';
-                    console.log('Paquete encontrado:', currentBox);
+                    console.log('✅ Paquete encontrado:', currentBox);
                 } else {
                     // Número de paquete no encontrado
                     document.getElementById('boxInfo').textContent = `❌ Paquete No Encontrado: ${boxNumber}`;
                     document.getElementById('boxInfo').style.background = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)';
-                    document.getElementById('message').innerHTML = '<p class="error">Número de paquete inválido. Por favor contacte al remitente.</p>';
-                    console.log('Paquete no encontrado en la lista');
+                    document.getElementById('message').innerHTML = `<p class="error">Número de paquete inválido: ${boxNumber}<br>Por favor contacte al remitente.</p>`;
+                    console.error('❌ Paquete no encontrado en la列表');
+                    console.error('❌ 可用的箱号:', packingLists);
                 }
             } else {
                 // No se proporcionó número de paquete
                 document.getElementById('boxInfo').textContent = '❌ Sin Número de Paquete';
                 document.getElementById('boxInfo').style.background = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)';
                 document.getElementById('message').innerHTML = '<p class="error">Por favor escanee el código QR correcto.</p>';
-                console.log('No se proporcionó número de paquete en la URL');
+                console.warn('⚠️ No se proporcionó número de paquete en la URL');
+                console.warn('⚠️ 正确的URL格式: index.html?box=CMEX-001');
             }
+
+            console.log('═══════════════════════════════════════');
         };
 
         // Manejar tecla Enter
