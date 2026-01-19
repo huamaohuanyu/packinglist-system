@@ -497,8 +497,9 @@
             // 预加载图片
             const img = new Image();
 
-            // 添加跨域属性
-            img.crossOrigin = 'anonymous';
+            // ⚠️ 注意: GitHub Raw 不支持跨域请求，移除 crossOrigin 属性
+            // 如果需要跨域加载图片，请使用 GitHub Pages 或其他支持 CORS 的服务
+            // img.crossOrigin = 'anonymous';  // 已注释，避免 CORS 错误
 
             img.onload = function() {
                 // 图片加载成功
@@ -530,10 +531,12 @@
                             1. 图片文件不存在于 GitHub 仓库<br>
                             2. GitHub 用户名配置错误<br>
                             3. 文件命名不匹配（区分大小写）<br>
-                            4. 仓库未公开或 GitHub Raw 访问受限
+                            4. 仓库未公开或 GitHub Raw 访问受限<br>
+                            5. 网络连接问题
                         </p>
                         <p style="margin-top: 10px; font-size: 12px; color: #666;">
-                            请联系管理员检查配置和图片文件。
+                            💡 提示：点击上方链接测试图片是否可访问<br>
+                            💡 如果链接可以打开，请刷新页面重试
                         </p>
                     </div>
                 `;
@@ -552,8 +555,22 @@
                     '图片文件': imageFile + '.jpg',
                     '完整URL': imageUrl,
                     'GitHub用户名': GITHUB_USERNAME,
-                    '仓库名': GITHUB_REPO
+                    '仓库名': GITHUB_REPO,
+                    '分支': GITHUB_BRANCH
                 });
+
+                // 提供重试按钮
+                setTimeout(() => {
+                    if (messageDiv.innerHTML.includes('图片加载失败')) {
+                        const retryBtn = document.createElement('button');
+                        retryBtn.innerHTML = '🔄 重新加载图片';
+                        retryBtn.style.cssText = 'margin-top: 10px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;';
+                        retryBtn.onclick = function() {
+                            verifyPassword();
+                        };
+                        messageDiv.appendChild(retryBtn);
+                    }
+                }, 100);
             };
 
             img.src = imageUrl;
