@@ -229,6 +229,18 @@
             "CMEX-010": "CMEX-009"   // Usa imagen de CMEX-009
         };
 
+        // Mapeo de producto (Caja -> Código de Producto) - Nueva función
+        // Formato: "número-caja": "código-producto"
+        // Si existe productMapping, tiene prioridad sobre imageMapping
+        const productMapping = {
+            // Ejemplo: CMEX-001 a CMEX-003 son producto 1169
+            // "CMEX-001": "1169",  // Usa imagen 1169.jpg
+            // "CMEX-002": "1169",  // Usa imagen 1169.jpg
+            // "CMEX-003": "1169",  // Usa imagen 1169.jpg
+            // "CMEX-004": "1170",  // Usa imagen 1170.jpg
+            // "CMEX-005": "1170"   // Usa imagen 1170.jpg
+        };
+
         // ============================================
         // Código del Programa (No es necesario modificar)
         // ============================================
@@ -302,9 +314,26 @@
                 return;
             }
 
-            // Generar URL de imagen usando imageMapping
+            // Generar URL de imagen (prioridad: productMapping > imageMapping > número de caja)
             const imageFormats = ['jpg', 'jpeg', 'png', 'webp'];
-            let imageFile = imageMapping[currentBox] || currentBox; // Usar mapeo o el número de caja
+            let imageFile;
+
+            // 1. Primero verificar productMapping (Caja -> Código de Producto)
+            if (productMapping && productMapping[currentBox]) {
+                imageFile = productMapping[currentBox];
+                console.log('Usando productMapping:', currentBox, '->', imageFile);
+            }
+            // 2. Si no existe productMapping, verificar imageMapping (Caja -> Archivo de imagen)
+            else if (imageMapping && imageMapping[currentBox]) {
+                imageFile = imageMapping[currentBox];
+                console.log('Usando imageMapping:', currentBox, '->', imageFile);
+            }
+            // 3. Si no existe ninguno, usar el número de caja
+            else {
+                imageFile = currentBox;
+                console.log('Usando número de caja:', currentBox);
+            }
+
             let imageUrl = GITHUB_BASE_URL + imageFile + '.jpg'; // Usar formato jpg por defecto
 
             // Verificar contraseña
