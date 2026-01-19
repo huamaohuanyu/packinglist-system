@@ -222,6 +222,7 @@
 ];
 
 // Mapeo de producto (Caja -> Código de Producto)
+// 优先级: productMapping > imageMapping > 箱子号
 // 20 cajas, 4 productos únicos
 const productMapping = {
     "CMEX-001": "1169",  // Producto: 1169
@@ -245,6 +246,40 @@ const productMapping = {
     "CMEX-019": "8860",  // Producto: 8860
     "CMEX-020": "8860"  // Producto: 8860
 };
+
+        // ============================================
+        // 初始化检查
+        // ============================================
+
+        // 检查映射配置的优先级
+        console.log('═══════════════════════════════════════');
+        console.log('📦 映射配置检查');
+        console.log('═══════════════════════════════════════');
+
+        const hasProductMapping = productMapping && Object.keys(productMapping).length > 0;
+        const hasImageMapping = imageMapping && Object.keys(imageMapping).length > 0;
+
+        console.log('productMapping:', hasProductMapping ? `✅ 存在 (${Object.keys(productMapping).length} 个映射)` : '❌ 空或未定义');
+        console.log('imageMapping:', hasImageMapping ? `⚠️ 存在 (${Object.keys(imageMapping).length} 个映射)` : '✅ 空或未定义');
+
+        if (hasProductMapping && hasImageMapping) {
+            console.warn('⚠️ 警告: productMapping 和 imageMapping 同时存在！');
+            console.warn('⚠️ 系统将优先使用 productMapping（产品货号映射）');
+            console.warn('⚠️ 如需使用 imageMapping，请将 productMapping 设为空对象: const productMapping = {};');
+        }
+
+        if (hasProductMapping) {
+            console.log('✅ 当前模式: 产品货号映射模式');
+            console.log('✅ 示例: CMEX-001 -> 1169 (将显示 1169.jpg)');
+        } else if (hasImageMapping) {
+            console.log('✅ 当前模式: 图片映射模式');
+            console.log('✅ 示例: CMEX-001 -> CMEX-001 (将显示 CMEX-001.jpg)');
+        } else {
+            console.log('✅ 当前模式: 默认模式（箱子号）');
+            console.log('✅ 示例: CMEX-001 -> CMEX-001 (将显示 CMEX-001.jpg)');
+        }
+
+        console.log('═══════════════════════════════════════');
 
         // ============================================
         // 诊断工具（仅在调试时使用）
@@ -393,24 +428,31 @@ const productMapping = {
             const imageFormats = ['jpg', 'jpeg', 'png', 'webp'];
             let imageFile;
 
+            console.log('🔍 开始生成图片URL...');
+            console.log('当前箱子:', currentBox);
+            console.log('productMapping:', productMapping);
+            console.log('imageMapping:', imageMapping);
+
             // 1. Primero verificar productMapping (Caja -> Código de Producto)
-            if (productMapping && productMapping[currentBox]) {
+            if (productMapping && Object.keys(productMapping).length > 0 && productMapping[currentBox]) {
                 imageFile = productMapping[currentBox];
-                console.log('Usando productMapping:', currentBox, '->', imageFile);
+                console.log('✅ 使用 productMapping:', currentBox, '->', imageFile);
             }
             // 2. Si no existe productMapping, verificar imageMapping (Caja -> Archivo de imagen)
-            else if (imageMapping && imageMapping[currentBox]) {
+            else if (imageMapping && Object.keys(imageMapping).length > 0 && imageMapping[currentBox]) {
                 imageFile = imageMapping[currentBox];
-                console.log('Usando imageMapping:', currentBox, '->', imageFile);
+                console.log('✅ 使用 imageMapping:', currentBox, '->', imageFile);
             }
             // 3. Si no existe ninguno, usar el número de caja
             else {
                 imageFile = currentBox;
-                console.log('Usando número de caja:', currentBox);
+                console.log('⚠️ 使用箱子号作为图片文件名:', currentBox);
             }
 
             // 优先使用 jpg 格式（如果不存在会自动尝试其他格式）
             let imageUrl = GITHUB_BASE_URL + imageFile + '.jpg';
+
+            console.log('📤 最终图片URL:', imageUrl);
 
             // Verificar contraseña
             if (password === '') {
