@@ -212,38 +212,24 @@
             // Agregue más números de paquete
         ];
 
-        // Mapeo de imágenes - Permite múltiples cajas con la misma imagen
-        // Formato: "número-caja": "nombre-archivo"
-        // Si no se encuentra en el mapeo, se usa el número de caja
-        // ⚠️ 重要: 如果使用 productMapping，请保持 imageMapping 为空对象 {}
-        const imageMapping = {
-            // Ejemplo: CMEX-001 a CMEX-010 usan la misma imagen
-            // 注意: 以下是示例配置,实际使用时请通过配置生成器生成
-            // "CMEX-001": "CMEX-001",
-            // "CMEX-002": "CMEX-001",  // Usa imagen de CMEX-001
-            // "CMEX-003": "CMEX-001",  // Usa imagen de CMEX-001
-            // "CMEX-004": "CMEX-001",  // Usa imagen de CMEX-001
-            // "CMEX-005": "CMEX-001",  // Usa imagen de CMEX-001
-            // "CMEX-006": "CMEX-006",  // Usa su propia imagen
-            // "CMEX-007": "CMEX-006",  // Usa imagen de CMEX-006
-            // "CMEX-008": "CMEX-006",  // Usa imagen de CMEX-006
-            // "CMEX-009": "CMEX-009",  // Usa su propia imagen
-            // "CMEX-010": "CMEX-009"   // Usa imagen de CMEX-009
+        // Mapeo de producto (Caja -> Código de Producto)
+        // 优先级: productMapping > imageMapping > 箱子号
+        // 10 cajas, 2 productos únicos
+        const productMapping = {
+            "CMEX-001": "1169",  // Producto: 1169
+            "CMEX-002": "1169",  // Producto: 1169
+            "CMEX-003": "1169",  // Producto: 1169
+            "CMEX-004": "1169",  // Producto: 1169
+            "CMEX-005": "1169",  // Producto: 1169
+            "CMEX-006": "9902",  // Producto: 9902
+            "CMEX-007": "9902",  // Producto: 9902
+            "CMEX-008": "9902",  // Producto: 9902
+            "CMEX-009": "9902",  // Producto: 9902
+            "CMEX-010": "9902"   // Producto: 9902
         };
 
-        // Mapeo de producto (Caja -> Código de Producto) - Nueva función
-        // Formato: "número-caja": "código-producto"
-        // Si existe productMapping, tiene prioridad sobre imageMapping
-        // ⚠️ 使用说明: 请通过配置生成器生成 productMapping 配置
-        // 生成后请同时复制 packingLists, productMapping 和 imageMapping = {}
-        const productMapping = {
-            // Ejemplo: CMEX-001 a CMEX-003 son producto 1169
-            // "CMEX-001": "1169",  // Usa imagen 1169.jpg
-            // "CMEX-002": "1169",  // Usa imagen 1169.jpg
-            // "CMEX-003": "1169",  // Usa imagen 1169.jpg
-            // "CMEX-004": "1170",  // Usa imagen 1170.jpg
-            // "CMEX-005": "1170"   // Usa imagen 1170.jpg
-        };
+        // 重要: 使用 productMapping 时，请清空或注释掉 imageMapping
+        const imageMapping = {};
 
         // ============================================
         // 初始化检查
