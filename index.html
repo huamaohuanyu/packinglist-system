@@ -381,7 +381,8 @@
                 console.log('Usando número de caja:', currentBox);
             }
 
-            let imageUrl = GITHUB_BASE_URL + imageFile + '.jpg'; // Usar formato jpg por defecto
+            // 优先使用 jpg 格式（如果不存在会自动尝试其他格式）
+            let imageUrl = GITHUB_BASE_URL + imageFile + '.jpg';
 
             // Verificar contraseña
             if (password === '') {
