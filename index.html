@@ -187,45 +187,45 @@
         const ACCESS_PASSWORD = "123456";
 
         // GitHub Configuration (modify username only, all image links will be auto-generated)
-        const GITHUB_USERNAME = "huamaohuanyu";  // ⚠️ Change to your GitHub username
-        const GITHUB_REPO = "packinglist-system";    // Repository name (usually no need to change)
-        const GITHUB_BRANCH = "main";              // Branch name (main or master, usually no need to change)
+        const GITHUB_USERNAME = "huamaohuanyu";  // ⚠️ Cambie a su nombre de usuario de GitHub
+        const GITHUB_REPO = "packinglist-system";    // Nombre del repositorio (generalmente no es necesario cambiar)
+        const GITHUB_BRANCH = "main";              // Nombre de la rama (main o master, generalmente no es necesario cambiar)
         const GITHUB_BASE_URL = `https://github.com/${GITHUB_USERNAME}/${GITHUB_REPO}/raw/${GITHUB_BRANCH}/images/`;
 
-        // Packing List Data Configuration
-        // Image link format: GITHUB_BASE_URL + box number + ".jpg"
-        // Example: GITHUB_BASE_URL + "BOX-001" + ".jpg"
+        // Configuración de Datos de Lista de Empaque
+        // Formato del enlace de imagen: GITHUB_BASE_URL + número de paquete + ".jpg"
+        // Ejemplo: GITHUB_BASE_URL + "CMEX-001" + ".jpg"
         const packingLists = [
             {
-                boxNumber: "BOX-001",
-                imageUrl: GITHUB_BASE_URL + "BOX-001.jpg",
-                productList: "Item A×100, Item B×50",
+                boxNumber: "CMEX-001",
+                imageUrl: GITHUB_BASE_URL + "CMEX-001.jpg",
+                productList: "Producto A×100, Producto B×50",
                 shipDate: "2026-01-19",
                 totalWeight: "25.5kg",
-                notes: "Fragile, handle with care"
+                notes: "Frágil, manejar con cuidado"
             },
             {
-                boxNumber: "BOX-002",
-                imageUrl: GITHUB_BASE_URL + "BOX-002.jpg",
-                productList: "Item C×80, Item D×120",
+                boxNumber: "CMEX-002",
+                imageUrl: GITHUB_BASE_URL + "CMEX-002.jpg",
+                productList: "Producto C×80, Producto D×120",
                 shipDate: "2026-01-19",
                 totalWeight: "30.2kg",
-                notes: "Keep dry"
+                notes: "Mantener seco"
             },
             {
-                boxNumber: "BOX-003",
-                imageUrl: GITHUB_BASE_URL + "BOX-003.jpg",
-                productList: "Item E×150",
+                boxNumber: "CMEX-003",
+                imageUrl: GITHUB_BASE_URL + "CMEX-003.jpg",
+                productList: "Producto E×150",
                 shipDate: "2026-01-19",
                 totalWeight: "20.8kg",
                 notes: ""
             }
-            // Add more boxes by copying the format above
-            // For example:
+            // Agregue más paquetes copiando el formato anterior
+            // Por ejemplo:
             // {
-            //     boxNumber: "BOX-004",
-            //     imageUrl: GITHUB_BASE_URL + "BOX-004.jpg",
-            //     productList: "Item F×200",
+            //     boxNumber: "CMEX-004",
+            //     imageUrl: GITHUB_BASE_URL + "CMEX-004.jpg",
+            //     productList: "Producto F×200",
             //     shipDate: "2026-01-19",
             //     totalWeight: "15.0kg",
             //     notes: ""
