@@ -719,7 +719,16 @@
 
         // 生成配置代码（带图片映射）
         function generateConfigWithMapping(boxNumbers, imageMapping, mappingTypeDescription = '') {
-            let code = `// Lista de números de paquete\n`;
+            let code = `// ══════════════════════════════════════════════════\n`;
+            code += `// 图片映射配置\n`;
+            code += `// 生成时间: ${new Date().toLocaleString('zh-CN')}\n`;
+            code += `// ══════════════════════════════════════════════════\n\n`;
+
+            code += `// ============================================\n`;
+            code += `// 步骤1: 复制以下配置到 index.html\n`;
+            code += `// ============================================\n\n`;
+
+            code += `// Lista de números de paquete\n`;
             code += `const packingLists = [\n`;
 
             boxNumbers.forEach((boxNumber, index) => {
@@ -775,6 +784,18 @@
                     code += `};`;
                 }
             }
+
+            code += `\n\n`;
+            code += `// ============================================\n`;
+            code += `// 步骤2: 上传图片到 GitHub\n`;
+            code += `// ============================================\n`;
+            code += `// 1. 访问: https://github.com/${GITHUB_USERNAME}/${GITHUB_REPO}/tree/main/images\n`;
+            code += `// 2. 上传图片到 images 文件夹\n`;
+            code += `// 3. 确保图片文件名与配置中的箱子号完全一致\n\n`;
+
+            code += `// 调试信息:\n`;
+            code += `// 图片URL格式: ${GITHUB_BASE_URL}[箱子号].jpg\n`;
+            code += `// 例如: ${GITHUB_BASE_URL}${boxNumbers[0]}.jpg\n`;
 
             document.getElementById('outputCode').value = code;
 
@@ -1081,7 +1102,16 @@
             const uniqueProducts = new Set(productBatches.map(b => b.productCode)).size;
 
             // 生成配置代码
-            let code = `// Lista de números de paquete\n`;
+            let code = `// ══════════════════════════════════════════════════\n`;
+            code += `// 产品货号映射配置\n`;
+            code += `// 生成时间: ${new Date().toLocaleString('zh-CN')}\n`;
+            code += `// ══════════════════════════════════════════════════\n\n`;
+
+            code += `// ============================================\n`;
+            code += `// 步骤1: 复制以下配置到 index.html\n`;
+            code += `// ============================================\n\n`;
+
+            code += `// Lista de números de paquete\n`;
             code += `const packingLists = [\n`;
 
             allBoxNumbers.forEach((boxNumber, index) => {
@@ -1091,7 +1121,6 @@
 
             code += `];\n\n`;
 
-            // 生成产品货号映射代码
             code += `// Mapeo de producto (Caja -> Código de Producto)\n`;
             code += `// ${allBoxNumbers.length} cajas, ${uniqueProducts} productos únicos\n`;
             code += `const productMapping = {\n`;
@@ -1105,14 +1134,26 @@
 
             code += `};\n\n`;
 
-            code += `// Nota: Solo necesita preparar las imágenes de los productos (${uniqueProducts} imágenes):\n`;
+            code += `// ============================================\n`;
+            code += `// 步骤2: 准备产品图片\n`;
+            code += `// ============================================\n`;
+            code += `// 只需要准备以下 ${uniqueProducts} 张产品图片：\n`;
             productBatches.forEach(batch => {
                 code += `// - ${batch.productCode}.jpg  (Cajas: ${batch.boxPrefix}${String(batch.startNum).padStart(batch.digits, '0')} ~ ${batch.boxPrefix}${String(batch.endNum).padStart(batch.digits, '0')})\n`;
             });
 
-            code += `\n// Ejemplo de uso:\n`;
-            code += `// Si la caja CMEX-001 mapea al producto 1169,\n`;
-            code += `// se mostrará la imagen: ${GITHUB_BASE_URL}1169.jpg\n`;
+            code += `\n// ============================================\n`;
+            code += `// 步骤3: 上传图片到 GitHub\n`;
+            code += `// ============================================\n`;
+            code += `// 1. 访问: https://github.com/${GITHUB_USERNAME}/${GITHUB_REPO}/tree/main/images\n`;
+            code += `// 2. 上传上述 ${uniqueProducts} 张图片到 images 文件夹\n`;
+            code += `// 3. 确保图片文件名与 productMapping 中的货号完全一致（区分大小写）\n\n`;
+
+            code += `// ============================================\n`;
+            code += `// 调试信息\n`;
+            code += `// ============================================\n`;
+            code += `// 图片URL格式: ${GITHUB_BASE_URL}[产品货号].jpg\n`;
+            code += `// 例如: ${GITHUB_BASE_URL}1169.jpg\n\n`;
 
             document.getElementById('outputCode').value = code;
 

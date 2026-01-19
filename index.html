@@ -242,6 +242,29 @@
         };
 
         // ============================================
+        // 诊断工具（仅在调试时使用）
+        // ============================================
+
+        // 在控制台显示系统配置信息
+        function showSystemDiagnostic() {
+            console.log('═══════════════════════════════════════');
+            console.log('📦 系统诊断信息');
+            console.log('═══════════════════════════════════════');
+            console.log('当前箱号:', currentBox);
+            console.log('密码配置:', ACCESS_PASSWORD);
+            console.log('GitHub配置:', {
+                用户名: GITHUB_USERNAME,
+                仓库: GITHUB_REPO,
+                分支: GITHUB_BRANCH,
+                基础URL: GITHUB_BASE_URL
+            });
+            console.log('箱子列表:', packingLists);
+            console.log('产品映射:', productMapping);
+            console.log('图片映射:', imageMapping);
+            console.log('═══════════════════════════════════════');
+        }
+
+        // ============================================
         // Código del Programa (No es necesario modificar)
         // ============================================
 
@@ -410,6 +433,10 @@
 
             // 预加载图片
             const img = new Image();
+
+            // 添加跨域属性
+            img.crossOrigin = 'anonymous';
+
             img.onload = function() {
                 // 图片加载成功
                 messageDiv.innerHTML = '';
@@ -421,10 +448,33 @@
                         style="max-width: 100%; height: auto; border-radius: 10px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);"
                     />
                 `;
+                console.log('✅ 图片加载成功:', imageUrl);
             };
+
             img.onerror = function() {
-                // 图片加载失败
-                messageDiv.innerHTML = '<p class="error">❌ Error al cargar la imagen. Por favor contacte al remitente.</p>';
+                // 图片加载失败 - 提供详细的错误信息
+                const errorDetails = `
+                    <div style="text-align: left; padding: 10px;">
+                        <p class="error">❌ 图片加载失败</p>
+                        <p style="margin-top: 10px; font-size: 14px;">
+                            <strong>详细信息：</strong><br>
+                            • 箱号：${currentBox}<br>
+                            • 图片文件：${imageFile}.jpg<br>
+                            • 完整URL：<a href="${imageUrl}" target="_blank" style="color: #667eea;">${imageUrl}</a>
+                        </p>
+                        <p style="margin-top: 10px; font-size: 14px; color: #e74c3c;">
+                            <strong>可能的原因：</strong><br>
+                            1. 图片文件不存在于 GitHub 仓库<br>
+                            2. GitHub 用户名配置错误<br>
+                            3. 文件命名不匹配（区分大小写）<br>
+                            4. 仓库未公开或 GitHub Raw 访问受限
+                        </p>
+                        <p style="margin-top: 10px; font-size: 12px; color: #666;">
+                            请联系管理员检查配置和图片文件。
+                        </p>
+                    </div>
+                `;
+                messageDiv.innerHTML = errorDetails;
                 imageContainer.style.display = 'block';
                 imageContainer.innerHTML = `
                     <img
@@ -433,7 +483,16 @@
                         style="border-radius: 10px;"
                     />
                 `;
+                console.error('❌ 图片加载失败:', imageUrl);
+                console.error('请检查：', {
+                    '当前箱号': currentBox,
+                    '图片文件': imageFile + '.jpg',
+                    '完整URL': imageUrl,
+                    'GitHub用户名': GITHUB_USERNAME,
+                    '仓库名': GITHUB_REPO
+                });
             };
+
             img.src = imageUrl;
         }
     </script>
