@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简化批量配置生成器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            resize: vertical;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            font-size: 16px;
+            cursor: pointer;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            margin: 10px 5px;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+        }
+
+        .btn-success {
+            background: #27ae60;
+        }
+
+        .btn-success:hover {
+            background: #219150;
+        }
+
+        .btn-warning {
+            background: #f39c12;
+        }
+
+        .btn-warning:hover {
+            background: #e67e22;
+        }
+
+        textarea#outputCode {
+            height: 400px;
+            background: #2d2d2d;
+            color: #f8f8f2;
+        }
+
+        .info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #2196f3;
+        }
+
+        .warning {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #ffc107;
+        }
+
+        .success {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #4caf50;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .batch-add {
+            background: #e8f5e9;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .batch-add label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>📦 简化批量配置生成器</h1>
+
+    <div class="container">
+        <div class="info">
+            <strong>简化说明：</strong>
+            <p>系统已简化，只需配置箱子号列表。自动支持多格式图片（.jpg, .png, .webp等）。</p>
+        </div>
+
+        <!-- 方法一：手动输入箱子号 -->
+        <div class="section">
+            <h3>📝 方法一：手动输入箱子号列表</h3>
+            <p>每行一个箱子号，支持批量粘贴：</p>
+            <textarea id="boxNumbersInput" placeholder="CMEX-001&#10;CMEX-002&#10;CMEX-003&#10;..."></textarea>
+            <br>
+            <button class="btn" onclick="generateFromText()">生成配置</button>
+        </div>
+
+        <!-- 方法二：批量添加相同产品多箱 -->
+        <div class="section">
+            <h3>🔄 方法二：批量添加相同产品的多箱（推荐）</h3>
+            <p>例如：一款产品装了10箱，只需配置一次：</p>
+
+            <div class="batch-add">
+                <label>箱子前缀（如：CMEX-）：</label>
+                <input type="text" id="boxPrefix" value="CMEX-" style="width: 200px;">
+
+                <label>起始编号：</label>
+                <input type="number" id="startNumber" value="1" style="width: 100px;">
+
+                <label>结束编号：</label>
+                <input type="number" id="endNumber" value="10" style="width: 100px;">
+
+                <label>编号位数（3位：001，2位：01）：</label>
+                <input type="number" id="digitCount" value="3" style="width: 100px;">
+
+                <label>图片映射方式：</label>
+                <select id="imageMappingType" style="padding: 10px; border: 2px solid #ddd; border-radius: 8px; margin-bottom: 10px;">
+                    <option value="same">全部使用第一张图片（最省）</option>
+                    <option value="manual">手动指定映射（推荐，灵活）</option>
+                    <option value="individual">每个箱子独立图片</option>
+                </select>
+
+                <div id="imageGroupSettings" style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 10px 0; display: none;">
+                    <label style="color: #1976d2;">📦 按连续范围分组（旧方式）：</label>
+                    <p style="font-size: 12px; color: #666; margin-bottom: 10px;">
+                        例如：1-5箱用第1张图，6-10箱用第2张图
+                    </p>
+                    <textarea id="imageGroupConfig" style="height: 100px; font-size: 12px;" placeholder="每行一个组，格式：起始-结束&#10;1-5&#10;6-10&#10;11-20">1-5
+6-10</textarea>
+                </div>
+
+                <div id="manualMappingSettings" style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                    <label style="color: #f57c00;">📦 手动指定映射（推荐）：</label>
+                    <p style="font-size: 12px; color: #666; margin-bottom: 10px;">
+                        例如：A产品3箱、B产品5箱、C产品2箱，不均匀分配
+                    </p>
+                    <textarea id="manualMappingConfig" style="height: 200px; font-size: 12px;" placeholder="每行格式：箱子号=图片文件名&#10;例如：&#10;CMEX-001=CMEX-001&#10;CMEX-002=CMEX-001&#10;CMEX-003=CMEX-001&#10;CMEX-004=CMEX-004&#10;CMEX-005=CMEX-004&#10;CMEX-006=CMEX-004&#10;CMEX-007=CMEX-004&#10;CMEX-008=CMEX-004&#10;CMEX-009=CMEX-009&#10;CMEX-010=CMEX-009&#10;&#10;说明：&#10;- 箱子号=图片文件名 表示该箱子使用指定图片&#10;- 可以多个箱子指向同一张图片（如CMEX-002和CMEX-003都用CMEX-001）&#10;- 不需要连续编号，可以随意指定任意箱子的映射&#10;- 图片文件名不需要扩展名（自动尝试.jpg/.png/.webp）"></textarea>
+                    <div style="margin-top: 10px;">
+                        <button class="btn" onclick="autoFillMapping()">✨ 自动填充示例</button>
+                        <span style="font-size: 12px; color: #666; margin-left: 10px;">（将自动为当前范围内的箱子生成示例映射：前3箱用第1张图，中间5箱用第4张图，剩余用第9张图）</span>
+                    </div>
+                </div>
+
+                <br>
+                <button class="btn btn-success" onclick="generateBatch()">生成批次配置</button>
+            </div>
+        </div>
+
+        <!-- 方法三：多个批次 -->
+        <div class="section">
+            <h3>📦 方法三：管理多个产品批次</h3>
+            <p>为不同产品创建多个批次，最后合并：</p>
+
+            <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                <strong>批次管理：</strong>
+                <div id="batchList" style="margin: 15px 0;">
+                    <p>暂无批次</p>
+                </div>
+                <button class="btn" onclick="showBatchInput()">添加新批次</button>
+                <button class="btn btn-warning" onclick="clearBatches()">清空所有批次</button>
+                <button class="btn btn-success" onclick="mergeBatches()">合并所有批次</button>
+            </div>
+        </div>
+
+        <!-- 方法四：产品货号映射（最直观） -->
+        <div class="section">
+            <h3>🏷️ 方法四：产品货号映射（推荐）</h3>
+            <p>将箱子号映射到产品货号，只需准备产品货号的图片文件：</p>
+
+            <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                <!-- 产品批次管理 -->
+                <div style="margin-bottom: 15px;">
+                    <label style="font-weight: bold;">第一步：添加产品批次</label>
+                    <p style="font-size: 12px; color: #666; margin: 5px 0;">
+                        每个批次对应一个产品，一批货有多个产品就添加多个批次
+                    </p>
+
+                    <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                        <div style="margin-bottom: 10px;">
+                            <label style="font-weight: bold;">批次配置：</label>
+                        </div>
+
+                        <div style="margin-top: 10px;">
+                            <label>产品货号：</label>
+                            <input type="text" id="productCode" placeholder="1169" style="width: 100px;">
+
+                            <label>箱子前缀：</label>
+                            <input type="text" id="boxPrefix4" value="CMEX-" style="width: 80px;">
+
+                            <label>起始编号：</label>
+                            <input type="number" id="startNumber4" value="1" style="width: 70px;">
+
+                            <label>结束编号：</label>
+                            <input type="number" id="endNumber4" value="3" style="width: 70px;">
+
+                            <label>编号位数：</label>
+                            <input type="number" id="digitCount4" value="3" style="width: 60px;">
+
+                            <button class="btn btn-success" onclick="addProductBatch()">+ 添加批次</button>
+                        </div>
+
+                        <div id="productBatchList" style="margin-top: 15px;">
+                            <p style="font-size: 12px; color: #999;">暂无批次</p>
+                        </div>
+
+                        <div style="margin-top: 10px;">
+                            <button class="btn btn-warning" onclick="clearProductBatches()">清空所有批次</button>
+                            <button class="btn" onclick="autoFillProductBatches()">✨ 自动填充示例</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <label style="font-weight: bold;">第二步：生成配置</label>
+                    <div style="margin-top: 10px;">
+                        <button class="btn btn-success" style="font-size: 16px; padding: 12px 24px;" onclick="generateProductMappingFromBatches()">📦 生成产品货号映射配置</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 输出结果 -->
+        <div class="section">
+            <h3>📤 生成的配置代码</h3>
+            <textarea id="outputCode" readonly placeholder="配置代码将在这里生成..."></textarea>
+            <br>
+            <button class="btn btn-success" onclick="copyCode()">📋 复制配置代码</button>
+            <button class="btn" onclick="downloadCode()">⬇️ 下载配置文件</button>
+            <button class="btn" onclick="clearOutput()">🗑️ 清空输出</button>
+        </div>
+
+        <!-- 预览表格 -->
+        <div class="section" id="previewSection" style="display: none;">
+            <h3>📊 配置预览</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>箱子号</th>
+                        <th>产品货号</th>
+                        <th>图片URL</th>
+                        <th>映射说明</th>
+                    </tr>
+                </thead>
+                <tbody id="previewTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // 配置
+        // ============================================
+        const GITHUB_USERNAME = "huamaohuanyu";
+        const GITHUB_REPO = "packinglist-system";
+        const GITHUB_BRANCH = "main";
+        const GITHUB_BASE_URL = `https://github.com/${GITHUB_USERNAME}/${GITHUB_REPO}/raw/${GITHUB_BRANCH}/images/`;
+
+        // 存储批次
+        let batches = [];
+
+        // 存储产品批次
+        let productBatches = [];
+
+        // 从文本生成配置
+        function generateFromText() {
+            const input = document.getElementById('boxNumbersInput').value.trim();
+            if (!input) {
+                alert('请输入箱子号！');
+                return;
+            }
+
+            const boxNumbers = input.split('\n').map(line => line.trim()).filter(line => line);
+            generateConfig(boxNumbers);
+        }
+
+        // 批量生成配置
+        function generateBatch() {
+            const prefix = document.getElementById('boxPrefix').value.trim();
+            const startNum = parseInt(document.getElementById('startNumber').value);
+            const endNum = parseInt(document.getElementById('endNumber').value);
+            const digits = parseInt(document.getElementById('digitCount').value);
+            const mappingType = document.getElementById('imageMappingType').value;
+            const groupConfig = document.getElementById('imageGroupConfig').value.trim();
+            const manualConfig = document.getElementById('manualMappingConfig').value.trim();
+
+            if (!prefix || isNaN(startNum) || isNaN(endNum) || isNaN(digits)) {
+                alert('请填写完整的信息！');
+                return;
+            }
+
+            if (startNum > endNum) {
+                alert('起始编号不能大于结束编号！');
+                return;
+            }
+
+            const boxNumbers = [];
+            for (let i = startNum; i <= endNum; i++) {
+                const num = String(i).padStart(digits, '0');
+                boxNumbers.push(prefix + num);
+            }
+
+            // 生成图片映射
+            const imageMapping = generateImageMapping(boxNumbers, mappingType, groupConfig, manualConfig);
+
+            // 添加到批次列表（包含图片映射信息）
+            const batchName = `${prefix}${startNum}-${endNum} (${boxNumbers.length}箱, ${imageMapping.uniqueImages}张图片)`;
+            batches.push({
+                name: batchName,
+                boxNumbers: boxNumbers,
+                imageMapping: imageMapping.mapping,
+                mappingType: imageMapping.mappingTypeDescription
+            });
+
+            updateBatchList();
+            generateConfigWithMapping(boxNumbers, imageMapping.mapping, imageMapping.mappingTypeDescription);
+            alert(`成功生成 ${boxNumbers.length} 个箱子配置！只需 ${imageMapping.uniqueImages} 张图片！`);
+        }
+
+        // 生成图片映射
+        function generateImageMapping(boxNumbers, mappingType, groupConfig, manualConfig) {
+            const mapping = {};
+            let uniqueImages = 0;
+            let mappingTypeDescription = ''; // 用于生成代码时的注释
+
+            if (mappingType === 'same') {
+                // 全部使用第一张图片
+                const firstBox = boxNumbers[0];
+                boxNumbers.forEach(boxNum => {
+                    mapping[boxNum] = firstBox;
+                });
+                uniqueImages = 1;
+                mappingTypeDescription = '全部使用第一张图片';
+
+            } else if (mappingType === 'manual' && manualConfig && manualConfig.trim()) {
+                // 手动指定映射（新功能：支持不均匀分配）
+                const lines = manualConfig.split('\n')
+                    .map(line => line.trim())
+                    .filter(line => line && line.includes('='));
+
+                lines.forEach(line => {
+                    const parts = line.split('=');
+                    if (parts.length >= 2) {
+                        const boxNumber = parts[0].trim();
+                        const imageFile = parts[1].trim();
+
+                        // 验证箱子号是否在当前批次中
+                        if (boxNumbers.includes(boxNumber)) {
+                            // 验证图片文件名不为空
+                            if (imageFile) {
+                                mapping[boxNumber] = imageFile;
+                            }
+                        }
+                    }
+                });
+
+                // 为未手动指定的箱子使用默认映射（自己）
+                boxNumbers.forEach(boxNum => {
+                    if (!mapping[boxNum]) {
+                        mapping[boxNum] = boxNum;
+                    }
+                });
+
+                uniqueImages = new Set(Object.values(mapping)).size;
+                mappingTypeDescription = '手动指定映射';
+
+            } else if (groupConfig && groupConfig.trim()) {
+                // 按连续范围分组（旧方式）
+                const groups = groupConfig.split('\n')
+                    .map(line => line.trim())
+                    .filter(line => line && line.includes('-'))
+                    .map(line => {
+                        const parts = line.split('-');
+                        return {
+                            start: parseInt(parts[0]),
+                            end: parseInt(parts[1])
+                        };
+                    })
+                    .filter(group => !isNaN(group.start) && !isNaN(group.end));
+
+                // 为每个箱子分配图片
+                boxNumbers.forEach(boxNum => {
+                    const boxNumber = parseInt(boxNum.replace(/\D/g, '')); // 提取数字
+
+                    // 查找箱子所属的组
+                    const group = groups.find(g => boxNumber >= g.start && boxNumber <= g.end);
+
+                    if (group) {
+                        // 使用该组的第一张图片
+                        const firstBoxInGroup = boxNumbers.find(b => parseInt(b.replace(/\D/g, '')) === group.start);
+                        mapping[boxNum] = firstBoxInGroup || boxNum;
+                    } else {
+                        // 没有找到组，使用自己的图片
+                        mapping[boxNum] = boxNum;
+                    }
+                });
+
+                uniqueImages = new Set(Object.values(mapping)).size;
+                mappingTypeDescription = '按连续范围分组';
+
+            } else {
+                // 每个箱子独立图片
+                boxNumbers.forEach(boxNum => {
+                    mapping[boxNum] = boxNum;
+                });
+                uniqueImages = boxNumbers.length;
+                mappingTypeDescription = '每个箱子独立图片';
+            }
+
+            return { mapping, uniqueImages, mappingTypeDescription };
+        }
+
+        // 显示批次输入
+        function showBatchInput() {
+            const prefix = prompt('请输入箱子前缀（如：CMEX-）：', 'CMEX-');
+            if (!prefix) return;
+
+            const startNum = prompt('请输入起始编号（如：1）：', '1');
+            if (!startNum) return;
+
+            const endNum = prompt('请输入结束编号（如：10）：', '10');
+            if (!endNum) return;
+
+            const digits = prompt('请输入编号位数（如：3位=001，2位=01）：', '3');
+            if (!digits) return;
+
+            // 询问图片映射方式
+            const mappingType = prompt('请选择图片映射方式（输入数字）：\n1 - 全部使用第一张图片（最省）\n2 - 手动指定映射（灵活）\n3 - 每个箱子独立图片', '1');
+            if (!mappingType) return;
+
+            const boxNumbers = [];
+            for (let i = parseInt(startNum); i <= parseInt(endNum); i++) {
+                const num = String(i).padStart(parseInt(digits), '0');
+                boxNumbers.push(prefix + num);
+            }
+
+            // 生成该批次的图片映射
+            let imageMapping = {};
+            let mappingTypeDescription = '';
+            let manualConfig = '';
+            let groupConfig = '';
+
+            if (mappingType === '1') {
+                // 全部使用第一张图片
+                const firstBox = boxNumbers[0];
+                boxNumbers.forEach(boxNum => {
+                    imageMapping[boxNum] = firstBox;
+                });
+                mappingTypeDescription = '全部使用第一张图片';
+
+            } else if (mappingType === '2') {
+                // 手动指定映射
+                manualConfig = prompt(`请输入手动映射配置（每行格式：箱子号=图片文件名）\n例如：\n${prefix}001=${prefix}001\n${prefix}002=${prefix}001\n${prefix}003=${prefix}001\n${prefix}004=${prefix}004\n${prefix}005=${prefix}004`, '');
+                if (manualConfig !== null) {
+                    const lines = manualConfig.split('\n')
+                        .map(line => line.trim())
+                        .filter(line => line && line.includes('='));
+
+                    lines.forEach(line => {
+                        const parts = line.split('=');
+                        if (parts.length >= 2) {
+                            const boxNumber = parts[0].trim();
+                            const imageFile = parts[1].trim();
+                            if (boxNumbers.includes(boxNumber) && imageFile) {
+                                imageMapping[boxNumber] = imageFile;
+                            }
+                        }
+                    });
+
+                    // 为未手动指定的箱子使用默认映射
+                    boxNumbers.forEach(boxNum => {
+                        if (!imageMapping[boxNum]) {
+                            imageMapping[boxNum] = boxNum;
+                        }
+                    });
+                    mappingTypeDescription = '手动指定映射';
+                } else {
+                    // 用户取消，使用默认映射
+                    boxNumbers.forEach(boxNum => {
+                        imageMapping[boxNum] = boxNum;
+                    });
+                    mappingTypeDescription = '每个箱子独立图片';
+                }
+
+            } else {
+                // 每个箱子独立图片
+                boxNumbers.forEach(boxNum => {
+                    imageMapping[boxNum] = boxNum;
+                });
+                mappingTypeDescription = '每个箱子独立图片';
+            }
+
+            const uniqueImages = new Set(Object.values(imageMapping)).size;
+            const batchName = `${prefix}${startNum}-${endNum} (${boxNumbers.length}箱, ${uniqueImages}张图片)`;
+
+            batches.push({
+                name: batchName,
+                boxNumbers: boxNumbers,
+                imageMapping: imageMapping,
+                mappingType: mappingTypeDescription
+            });
+
+            updateBatchList();
+            alert(`批次 "${batchName}" 已添加！\n映射方式：${mappingTypeDescription}\n需要 ${uniqueImages} 张图片。`);
+        }
+
+        // 更新批次列表
+        function updateBatchList() {
+            const batchListDiv = document.getElementById('batchList');
+            if (batches.length === 0) {
+                batchListDiv.innerHTML = '<p>暂无批次</p>';
+                return;
+            }
+
+            let html = '<ul>';
+            batches.forEach((batch, index) => {
+                const mappingInfo = batch.mappingType ? `<span style="color:#1976d2;font-size:12px;">(${batch.mappingType})</span>` : '';
+                const uniqueImages = batch.imageMapping ? new Set(Object.values(batch.imageMapping)).size : batch.boxNumbers.length;
+                html += `<li><strong>${batch.name}</strong> - ${batch.boxNumbers.length} 箱, ${uniqueImages} 张图片 ${mappingInfo} <button onclick="removeBatch(${index})" style="margin-left:10px;padding:5px 10px;font-size:12px;">删除</button></li>`;
+            });
+            html += '</ul>';
+
+            // 计算总箱数和总图片数
+            const totalBoxes = batches.reduce((sum, b) => sum + b.boxNumbers.length, 0);
+            const totalImages = batches.reduce((sum, b) => {
+                if (b.imageMapping && Object.keys(b.imageMapping).length > 0) {
+                    return sum + new Set(Object.values(b.imageMapping)).size;
+                }
+                return sum + b.boxNumbers.length;
+            }, 0);
+
+            html += `<p style="margin-top:10px;"><strong>总计：${batches.length} 个批次，${totalBoxes} 箱，${totalImages} 张图片</strong></p>`;
+            batchListDiv.innerHTML = html;
+        }
+
+        // 删除批次
+        function removeBatch(index) {
+            if (confirm('确定要删除这个批次吗？')) {
+                batches.splice(index, 1);
+                updateBatchList();
+            }
+        }
+
+        // 清空所有批次
+        function clearBatches() {
+            if (confirm('确定要清空所有批次吗？')) {
+                batches = [];
+                updateBatchList();
+            }
+        }
+
+        // 合并所有批次
+        function mergeBatches() {
+            if (batches.length === 0) {
+                alert('没有批次可合并！');
+                return;
+            }
+
+            const allBoxNumbers = [];
+            const mergedImageMapping = {};
+
+            // 重新生成合并后的图片映射
+            // 每个批次独立处理自己的映射
+            batches.forEach(batch => {
+                const startIndex = allBoxNumbers.length;
+                allBoxNumbers.push(...batch.boxNumbers);
+
+                // 如果批次有自定义映射，需要调整索引
+                if (batch.imageMapping && Object.keys(batch.imageMapping).length > 0) {
+                    // 检查是否是"全部使用第一张图片"模式
+                    const batchFirstBox = batch.boxNumbers[0];
+                    const allUseFirst = batch.boxNumbers.every(boxNum => 
+                        batch.imageMapping[boxNum] === batchFirstBox
+                    );
+
+                    if (allUseFirst && batch.mappingType === '全部使用第一张图片') {
+                        // 全部使用该批次的第一张图片
+                        batch.boxNumbers.forEach(boxNum => {
+                            mergedImageMapping[boxNum] = batchFirstBox;
+                        });
+                    } else {
+                        // 使用原始映射
+                        Object.assign(mergedImageMapping, batch.imageMapping);
+                    }
+                }
+            });
+
+            // 计算实际需要的图片数量
+            const uniqueImages = new Set(Object.values(mergedImageMapping)).size;
+            const totalBoxes = allBoxNumbers.length;
+            const mappingTypeDescription = uniqueImages === 1 ? '所有批次统一使用第一张图片' : '多批次合并（独立映射）';
+
+            generateConfigWithMapping(allBoxNumbers, mergedImageMapping, mappingTypeDescription);
+            alert(`成功合并 ${batches.length} 个批次，共 ${allBoxNumbers.length} 箱，需要 ${uniqueImages} 张图片！`);
+        }
+
+        // 生成配置代码（带图片映射）
+        function generateConfigWithMapping(boxNumbers, imageMapping, mappingTypeDescription = '') {
+            let code = `// Lista de números de paquete\n`;
+            code += `const packingLists = [\n`;
+
+            boxNumbers.forEach((boxNumber, index) => {
+                const comma = index < boxNumbers.length - 1 ? ',' : '';
+                code += `    "${boxNumber}"${comma}\n`;
+            });
+
+            code += `];\n\n`;
+
+            // 生成图片映射代码
+            code += `// Mapeo de imágenes - ${mappingTypeDescription}\n`;
+
+            // 只生成有映射的箱子（非自身映射）
+            const mappedBoxes = boxNumbers.filter(boxNum => imageMapping[boxNum] !== boxNum);
+
+            if (mappedBoxes.length === 0) {
+                // 每个箱子独立图片
+                code += `// Cada caja usa su propia imagen (no se requiere mapeo)\n`;
+                code += `const imageMapping = {};\n`;
+            } else {
+                // 检查是否所有箱子都映射到同一张图片
+                const uniqueImages = new Set(Object.values(imageMapping)).size;
+                const firstBox = boxNumbers[0];
+                const allMapToFirst = boxNumbers.every(boxNum => imageMapping[boxNum] === firstBox);
+
+                if (allMapToFirst && uniqueImages === 1) {
+                    // 所有箱子都映射到第一张图片：生成简洁的配置
+                    code += `// Todos los paquetes usan la misma imagen (${firstBox}.jpg)\n`;
+                    code += `// Solo necesita preparar 1 imagen: ${firstBox}.jpg\n`;
+                    code += `const imageMapping = {\n`;
+                    // 动态生成示例箱子号
+                    const sampleBoxes = boxNumbers.slice(1, 4);
+                    sampleBoxes.forEach((boxNum, idx) => {
+                        const isLast = idx === sampleBoxes.length - 1;
+                        const comma = isLast ? '' : ',';
+                        code += `    "${boxNum}": "${firstBox}"${comma}\n`;
+                    });
+                    if (boxNumbers.length > 4) {
+                        code += `    // ... (todos los demás paquetes)\n`;
+                        code += `    "${boxNumbers[boxNumbers.length - 1]}": "${firstBox}"\n`;
+                    }
+                    code += `};\n\n`;
+                    code += `// Nota: También puede dejar el imageMapping vacío {} y solo preparar ${firstBox}.jpg\n`;
+                } else {
+                    // 部分箱子使用映射
+                    code += `const imageMapping = {\n`;
+                    mappedBoxes.forEach((boxNumber, index) => {
+                        const imageFile = imageMapping[boxNumber];
+                        const comment = boxNumber !== imageFile ? `// Usa imagen de ${imageFile}` : '';
+                        const comma = index < mappedBoxes.length - 1 ? ',' : '';
+                        code += `    "${boxNumber}": "${imageFile}", ${comment}\n`;
+                    });
+                    code += `};`;
+                }
+            }
+
+            document.getElementById('outputCode').value = code;
+
+            // 显示预览表格（包含图片映射信息）
+            const tbody = document.getElementById('previewTable');
+            tbody.innerHTML = '';
+
+            boxNumbers.forEach((boxNumber, index) => {
+                const imageFile = imageMapping[boxNumber] || boxNumber;
+                const isMapped = imageFile !== boxNumber;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${boxNumber}</td>
+                    <td><a href="${GITHUB_BASE_URL}${imageFile}.jpg" target="_blank">${GITHUB_BASE_URL}${imageFile}.jpg</a></td>
+                    <td>${isMapped ? '<span style="color:#27ae60;">✅ 映射到 ' + imageFile + '</span>' : '<span style="color:#666;">独立图片</span>'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('previewSection').style.display = 'block';
+        }
+
+        // 生成配置代码（旧版本，保持兼容）
+        function generateConfig(boxNumbers) {
+            generateConfigWithMapping(boxNumbers, {});
+        }
+
+        // 复制配置代码
+        function copyCode() {
+            const textarea = document.getElementById('outputCode');
+            textarea.select();
+            document.execCommand('copy');
+            alert('配置代码已复制到剪贴板！');
+        }
+
+        // 下载配置文件
+        function downloadCode() {
+            const code = document.getElementById('outputCode').value;
+            if (!code) {
+                alert('没有可下载的内容！');
+                return;
+            }
+
+            const blob = new Blob([code], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'packingLists-config.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // 清空输出
+        function clearOutput() {
+            document.getElementById('outputCode').value = '';
+            document.getElementById('previewTable').innerHTML = '';
+            document.getElementById('previewSection').style.display = 'none';
+        }
+
+        // 监听映射类型变化，显示/隐藏对应设置
+        document.addEventListener('DOMContentLoaded', function() {
+            const mappingTypeSelect = document.getElementById('imageMappingType');
+            const manualSettings = document.getElementById('manualMappingSettings');
+            const groupSettings = document.getElementById('imageGroupSettings');
+
+            mappingTypeSelect.addEventListener('change', function() {
+                if (this.value === 'manual') {
+                    manualSettings.style.display = 'block';
+                    groupSettings.style.display = 'none';
+                } else if (this.value === 'same' || this.value === 'individual') {
+                    manualSettings.style.display = 'none';
+                    groupSettings.style.display = 'none';
+                }
+            });
+        });
+
+        // 自动填充示例映射
+        function autoFillMapping() {
+            const prefix = document.getElementById('boxPrefix').value.trim();
+            const startNum = parseInt(document.getElementById('startNumber').value);
+            const endNum = parseInt(document.getElementById('endNumber').value);
+            const digits = parseInt(document.getElementById('digitCount').value);
+
+            if (!prefix || isNaN(startNum) || isNaN(endNum) || isNaN(digits)) {
+                alert('请先填写箱子前缀和编号范围！');
+                return;
+            }
+
+            const totalBoxes = endNum - startNum + 1;
+            if (totalBoxes < 3) {
+                alert('箱子数量至少需要3个才能生成示例映射！');
+                return;
+            }
+
+            // 生成示例映射：前3箱用第1张图，中间5箱用第4张图，剩余用第9张图
+            let manualMapping = '';
+            let boxNum = 1;
+
+            while (boxNum <= totalBoxes) {
+                const boxNumber = `${prefix}${String(startNum + boxNum - 1).padStart(digits, '0')}`;
+
+                // 前三箱用第一张图
+                if (boxNum <= 3) {
+                    const firstBox = `${prefix}${String(startNum).padStart(digits, '0')}`;
+                    manualMapping += `${boxNumber}=${firstBox}\n`;
+                }
+                // 中间五箱用第四张图
+                else if (boxNum >= 4 && boxNum <= 8) {
+                    const fourthBox = `${prefix}${String(startNum + 3).padStart(digits, '0')}`;
+                    manualMapping += `${boxNumber}=${fourthBox}\n`;
+                }
+                // 剩余的用第9张图（如果有）
+                else {
+                    const ninthBox = `${prefix}${String(startNum + 8).padStart(digits, '0')}`;
+                    manualMapping += `${boxNumber}=${ninthBox}\n`;
+                }
+
+                boxNum++;
+            }
+
+            document.getElementById('manualMappingConfig').value = manualMapping;
+            alert('已自动填充示例映射！您可以根据实际需求修改。');
+        }
+
+        // 自动填充产品批次示例
+        function autoFillProductBatches() {
+            productBatches = [];
+            const prefix = "CMEX-";
+            const digits = 3;
+
+            // 生成5个产品批次的示例
+            productBatches.push({
+                productCode: "1169",
+                boxPrefix: prefix,
+                startNum: 1,
+                endNum: 3,
+                digits: digits
+            });
+
+            productBatches.push({
+                productCode: "1170",
+                boxPrefix: prefix,
+                startNum: 4,
+                endNum: 8,
+                digits: digits
+            });
+
+            productBatches.push({
+                productCode: "1171",
+                boxPrefix: prefix,
+                startNum: 9,
+                endNum: 10,
+                digits: digits
+            });
+
+            productBatches.push({
+                productCode: "1172",
+                boxPrefix: prefix,
+                startNum: 11,
+                endNum: 13,
+                digits: digits
+            });
+
+            productBatches.push({
+                productCode: "1173",
+                boxPrefix: prefix,
+                startNum: 14,
+                endNum: 15,
+                digits: digits
+            });
+
+            updateProductBatchList();
+            alert('已自动填充5个产品批次示例！');
+        }
+
+        // 添加产品批次
+        function addProductBatch() {
+            const productCode = document.getElementById('productCode').value.trim();
+            const boxPrefix = document.getElementById('boxPrefix4').value.trim();
+            const startNum = parseInt(document.getElementById('startNumber4').value);
+            const endNum = parseInt(document.getElementById('endNumber4').value);
+            const digits = parseInt(document.getElementById('digitCount4').value);
+
+            if (!productCode) {
+                alert('请输入产品货号！');
+                return;
+            }
+
+            if (!boxPrefix) {
+                alert('请输入箱子前缀！');
+                return;
+            }
+
+            if (isNaN(startNum) || isNaN(endNum) || isNaN(digits)) {
+                alert('请输入有效的编号信息！');
+                return;
+            }
+
+            if (startNum > endNum) {
+                alert('起始编号不能大于结束编号！');
+                return;
+            }
+
+            // 计算箱数
+            const boxCount = endNum - startNum + 1;
+
+            // 添加到批次列表
+            productBatches.push({
+                productCode: productCode,
+                boxPrefix: boxPrefix,
+                startNum: startNum,
+                endNum: endNum,
+                digits: digits
+            });
+
+            updateProductBatchList();
+            alert(`已添加批次：产品 ${productCode}，${boxCount} 箱（${boxPrefix}${String(startNum).padStart(digits, '0')} ~ ${boxPrefix}${String(endNum).padStart(digits, '0')}）`);
+        }
+
+        // 更新产品批次列表显示
+        function updateProductBatchList() {
+            const batchListDiv = document.getElementById('productBatchList');
+            if (productBatches.length === 0) {
+                batchListDiv.innerHTML = '<p style="font-size: 12px; color: #999;">暂无批次</p>';
+                return;
+            }
+
+            let html = '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px;">';
+            productBatches.forEach((batch, index) => {
+                const boxCount = batch.endNum - batch.startNum + 1;
+                html += `
+                    <div style="background: #fff; padding: 10px; border: 1px solid #ddd; border-radius: 6px; border-left: 4px solid #1976d2;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <strong style="color: #1976d2;">产品 ${batch.productCode}</strong>
+                            <button onclick="removeProductBatch(${index})" style="background: #e74c3c; color: white; border: none; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 12px;">删除</button>
+                        </div>
+                        <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                            ${batch.boxPrefix}${String(batch.startNum).padStart(batch.digits, '0')} ~
+                            ${batch.boxPrefix}${String(batch.endNum).padStart(batch.digits, '0')}
+                            （${boxCount} 箱）
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+
+            // 计算总计
+            const totalBoxes = productBatches.reduce((sum, b) => sum + (b.endNum - b.startNum + 1), 0);
+            const totalProducts = productBatches.length;
+
+            html += `<div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #1976d2;">
+                <strong>总计：${totalProducts} 个产品，${totalBoxes} 箱，需要 ${totalProducts} 张图片</strong>
+            </div>`;
+
+            batchListDiv.innerHTML = html;
+        }
+
+        // 删除产品批次
+        function removeProductBatch(index) {
+            if (confirm('确定要删除这个批次吗？')) {
+                productBatches.splice(index, 1);
+                updateProductBatchList();
+            }
+        }
+
+        // 清空所有产品批次
+        function clearProductBatches() {
+            if (confirm('确定要清空所有批次吗？')) {
+                productBatches = [];
+                updateProductBatchList();
+            }
+        }
+
+        // 从产品批次生成配置
+        function generateProductMappingFromBatches() {
+            if (productBatches.length === 0) {
+                alert('请先添加产品批次！');
+                return;
+            }
+
+            // 收集所有箱子号
+            const allBoxNumbers = [];
+            const productMapping = {};
+
+            // 遍历每个批次，生成箱子号和映射
+            productBatches.forEach(batch => {
+                for (let i = batch.startNum; i <= batch.endNum; i++) {
+                    const boxNumber = `${batch.boxPrefix}${String(i).padStart(batch.digits, '0')}`;
+                    allBoxNumbers.push(boxNumber);
+                    // 映射到产品货号
+                    productMapping[boxNumber] = batch.productCode;
+                }
+            });
+
+            // 计算产品数量（去重）
+            const uniqueProducts = new Set(productBatches.map(b => b.productCode)).size;
+
+            // 生成配置代码
+            let code = `// Lista de números de paquete\n`;
+            code += `const packingLists = [\n`;
+
+            allBoxNumbers.forEach((boxNumber, index) => {
+                const comma = index < allBoxNumbers.length - 1 ? ',' : '';
+                code += `    "${boxNumber}"${comma}\n`;
+            });
+
+            code += `];\n\n`;
+
+            // 生成产品货号映射代码
+            code += `// Mapeo de producto (Caja -> Código de Producto)\n`;
+            code += `// ${allBoxNumbers.length} cajas, ${uniqueProducts} productos únicos\n`;
+            code += `const productMapping = {\n`;
+
+            // 只生成有产品货号映射的箱子
+            Object.keys(productMapping).forEach((boxNumber, index) => {
+                const productCode = productMapping[boxNumber];
+                const comma = index < Object.keys(productMapping).length - 1 ? ',' : '';
+                code += `    "${boxNumber}": "${productCode}"${comma}  // Producto: ${productCode}\n`;
+            });
+
+            code += `};\n\n`;
+
+            code += `// Nota: Solo necesita preparar las imágenes de los productos (${uniqueProducts} imágenes):\n`;
+            productBatches.forEach(batch => {
+                code += `// - ${batch.productCode}.jpg  (Cajas: ${batch.boxPrefix}${String(batch.startNum).padStart(batch.digits, '0')} ~ ${batch.boxPrefix}${String(batch.endNum).padStart(batch.digits, '0')})\n`;
+            });
+
+            code += `\n// Ejemplo de uso:\n`;
+            code += `// Si la caja CMEX-001 mapea al producto 1169,\n`;
+            code += `// se mostrará la imagen: ${GITHUB_BASE_URL}1169.jpg\n`;
+
+            document.getElementById('outputCode').value = code;
+
+            // 显示预览表格（包含产品货号信息）
+            const tbody = document.getElementById('previewTable');
+            tbody.innerHTML = '';
+
+            allBoxNumbers.forEach((boxNumber, index) => {
+                const productCode = productMapping[boxNumber];
+                const imageUrl = `${GITHUB_BASE_URL}${productCode}.jpg`;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${boxNumber}</td>
+                    <td style="font-weight:bold; color:#1976d2;">${productCode}</td>
+                    <td><a href="${imageUrl}" target="_blank">${imageUrl}</a></td>
+                    <td><span style="color:#27ae60;">✅ 产品 ${productCode}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('previewSection').style.display = 'block';
+            alert(`成功生成 ${allBoxNumbers.length} 个箱子配置！只需准备 ${uniqueProducts} 张产品图片！`);
+        }
+    </script>
+</body>
+</html>

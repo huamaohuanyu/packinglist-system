@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>二维码批量生成器 - 装箱单系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="url"] {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin: 5px 0;
+            font-size: 14px;
+            width: 200px;
+        }
+
+        .input-group {
+            margin: 10px 0;
+        }
+
+        .input-group label {
+            display: inline-block;
+            width: 150px;
+            font-weight: bold;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            font-size: 16px;
+            cursor: pointer;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            margin: 10px 5px;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+        }
+
+        .btn-success {
+            background: #27ae60;
+        }
+
+        .btn-success:hover {
+            background: #219150;
+        }
+
+        .btn-warning {
+            background: #f39c12;
+        }
+
+        .btn-warning:hover {
+            background: #e67e22;
+        }
+
+        #qrcodeContainer {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .qrcode-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .qrcode-item canvas,
+        .qrcode-item img {
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .qrcode-item .box-number {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .qrcode-item .url {
+            font-size: 10px;
+            color: #666;
+            word-break: break-all;
+        }
+
+        .info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #2196f3;
+        }
+
+        .warning {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #ffc107;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+    <h1>📱 二维码批量生成器 - 装箱单系统</h1>
+
+    <div class="container">
+        <div class="info">
+            <strong>使用说明：</strong>
+            <ol>
+                <li>输入您的网站域名（如：https://packinglist-system.vercel.app）</li>
+                <li>输入箱子号列表（每行一个）</li>
+                <li>点击生成二维码</li>
+                <li>打印并粘贴到货物外包装</li>
+            </ol>
+        </div>
+
+        <!-- 域名配置 -->
+        <div class="section">
+            <h3>🌐 域名配置</h3>
+            <div class="input-group">
+                <label>网站域名：</label>
+                <input type="url" id="domainUrl" value="https://packinglist-system.vercel.app" style="width: 400px;">
+                <small>例如：https://packinglist-system.vercel.app</small>
+            </div>
+            <div class="input-group">
+                <label>二维码大小：</label>
+                <input type="number" id="qrSize" value="128" min="64" max="512" step="32">
+                <small>像素（64-512）</small>
+            </div>
+        </div>
+
+        <!-- 箱子号输入 -->
+        <div class="section">
+            <h3>📦 箱子号列表</h3>
+            <textarea id="boxNumbers" placeholder="CMEX-001&#10;CMEX-002&#10;CMEX-003&#10;...">CMEX-001
+CMEX-002
+CMEX-003
+CMEX-004
+CMEX-005</textarea>
+            <br>
+            <button class="btn" onclick="generateQRCodes()">📱 生成二维码</button>
+            <button class="btn btn-warning" onclick="clearQRCodes()">🗑️ 清空</button>
+            <button class="btn btn-success" onclick="printQRCodes()">🖨️ 打印二维码</button>
+        </div>
+
+        <!-- 二维码显示区域 -->
+        <div id="qrcodeContainer"></div>
+    </div>
+
+    <!-- QRCode.js 库 -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+
+    <script>
+        // 生成二维码
+        function generateQRCodes() {
+            const domainUrl = document.getElementById('domainUrl').value.trim();
+            const qrSize = parseInt(document.getElementById('qrSize').value);
+            const boxNumbersText = document.getElementById('boxNumbers').value.trim();
+            const container = document.getElementById('qrcodeContainer');
+
+            // 验证输入
+            if (!domainUrl) {
+                alert('请输入网站域名！');
+                return;
+            }
+
+            if (!boxNumbersText) {
+                alert('请输入箱子号列表！');
+                return;
+            }
+
+            // 清空容器
+            container.innerHTML = '';
+
+            // 处理箱子号列表
+            const boxNumbers = boxNumbersText.split('\n')
+                .map(line => line.trim())
+                .filter(line => line);
+
+            if (boxNumbers.length === 0) {
+                alert('请输入有效的箱子号！');
+                return;
+            }
+
+            // 生成二维码
+            boxNumbers.forEach((boxNumber, index) => {
+                // 构建 URL
+                const url = `${domainUrl}/?box=${boxNumber}`;
+
+                // 创建二维码容器
+                const qrcodeItem = document.createElement('div');
+                qrcodeItem.className = 'qrcode-item';
+
+                // 创建二维码
+                const qrCanvas = document.createElement('canvas');
+                qrcodeItem.appendChild(qrCanvas);
+
+                // 添加箱子号
+                const boxNumberDiv = document.createElement('div');
+                boxNumberDiv.className = 'box-number';
+                boxNumberDiv.textContent = boxNumber;
+                qrcodeItem.appendChild(boxNumberDiv);
+
+                // 添加 URL（可选，用于调试）
+                const urlDiv = document.createElement('div');
+                urlDiv.className = 'url';
+                urlDiv.textContent = url;
+                qrcodeItem.appendChild(urlDiv);
+
+                // 生成二维码
+                QRCode.toCanvas(qrCanvas, url, {
+                    width: qrSize,
+                    margin: 2,
+                    color: {
+                        dark: '#000000',
+                        light: '#FFFFFF'
+                    },
+                    errorCorrectionLevel: 'H'
+                }, function(error) {
+                    if (error) {
+                        console.error('生成二维码失败:', error);
+                        qrCanvas.parentElement.innerHTML = '<p style="color:red;">生成失败</p>';
+                    }
+                });
+
+                // 添加到容器
+                container.appendChild(qrcodeItem);
+            });
+
+            alert(`成功生成 ${boxNumbers.length} 个二维码！`);
+        }
+
+        // 清空二维码
+        function clearQRCodes() {
+            if (confirm('确定要清空所有二维码吗？')) {
+                document.getElementById('qrcodeContainer').innerHTML = '';
+            }
+        }
+
+        // 打印二维码
+        function printQRCodes() {
+            const container = document.getElementById('qrcodeContainer');
+            if (container.children.length === 0) {
+                alert('请先生成二维码！');
+                return;
+            }
+
+            // 创建打印窗口
+            const printWindow = window.open('', '_blank');
+            if (!printWindow) {
+                alert('弹出窗口被阻止，请允许弹出窗口后重试！');
+                return;
+            }
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>打印二维码</title>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            padding: 20px;
+                        }
+                        .qrcode-item {
+                            display: inline-block;
+                            width: 200px;
+                            margin: 15px;
+                            padding: 15px;
+                            border: 1px solid #ddd;
+                            border-radius: 8px;
+                            text-align: center;
+                            page-break-inside: avoid;
+                        }
+                        .qrcode-item canvas {
+                            margin-bottom: 10px;
+                        }
+                        .box-number {
+                            font-size: 18px;
+                            font-weight: bold;
+                            color: #000;
+                        }
+                        .url {
+                            font-size: 10px;
+                            color: #666;
+                            word-break: break-all;
+                        }
+                        @media print {
+                            .qrcode-item {
+                                page-break-inside: avoid;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h1 style="text-align:center;margin-bottom:30px;">装箱单二维码</h1>
+                    ${container.innerHTML}
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+    </script>
+</body>
+</html>
