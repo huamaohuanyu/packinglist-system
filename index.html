@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Lista de Empaque</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 32px;
+        }
+
+        .box-info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .input-group {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: #666;
+            font-size: 16px;
+        }
+
+        input {
+            padding: 15px;
+            font-size: 18px;
+            width: 300px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 18px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+        }
+
+        .message {
+            margin: 20px 0;
+            font-size: 16px;
+        }
+
+        .error {
+            color: #e74c3c;
+            background: #fee;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .loading {
+            color: #667eea;
+            background: #eef;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .success {
+            color: #27ae60;
+            background: #efe;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .image-container {
+            margin-top: 30px;
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            background: #f9f9f9;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            input {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .box-info {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📦 Sistema de Lista de Empaque</h1>
+
+        <!-- Información del número de paquete (mostrada automáticamente) -->
+        <div class="box-info" id="boxInfo">
+            Cargando información del paquete...
+        </div>
+
+        <!-- Entrada de contraseña -->
+        <div class="input-group">
+            <label for="password">Ingrese la Contraseña de Acceso</label>
+            <input
+                type="password"
+                id="password"
+                placeholder="Ingrese contraseña"
+                onkeypress="handleKeyPress(event)"
+            >
+        </div>
+
+        <button onclick="verifyPassword()">Ver Lista de Empaque</button>
+
+        <div id="message" class="message"></div>
+
+        <!-- Área de visualización de imágenes -->
+        <div id="imageContainer" class="image-container" style="display: none;"></div>
+    </div>
+
+    <script>
+        // ============================================
+        // Configuración - Modifique los datos aquí
+        // ============================================
+
+        // Contraseña de acceso (modifique aquí para cambiar la contraseña)
+        const ACCESS_PASSWORD = "123456";
+
+        // Configuración de GitHub (solo modifique el nombre de usuario, todos los enlaces se generarán automáticamente)
+        const GITHUB_USERNAME = "huamaohuanyu";  // ⚠️ Cambie a su nombre de usuario de GitHub
+        const GITHUB_REPO = "packinglist-system";    // Nombre del repositorio (generalmente no es necesario cambiar)
+        const GITHUB_BRANCH = "main";              // Nombre de la rama (main o master, generalmente no es necesario cambiar)
+        const GITHUB_BASE_URL = `https://github.com/${GITHUB_USERNAME}/${GITHUB_REPO}/raw/${GITHUB_BRANCH}/images/`;
+
+        // Configuración de Datos de Lista de Empaque
+        // Soporta múltiples formatos de imagen: jpg, jpeg, png, webp
+        // Ignora mayúsculas y minúsculas en el número de paquete
+        // Soporta múltiples cajas con la misma imagen usando imageMapping
+
+        // Lista de números de paquete
+        const packingLists = [
+            "CMEX-001",
+            "CMEX-002",
+            "CMEX-003",
+            "CMEX-004",
+            "CMEX-005",
+            "CMEX-006",
+            "CMEX-007",
+            "CMEX-008",
+            "CMEX-009",
+            "CMEX-010"
+            // Agregue más números de paquete
+        ];
+
+        // Mapeo de imágenes - Permite múltiples cajas con la misma imagen
+        // Formato: "número-caja": "nombre-archivo"
+        // Si no se encuentra en el mapeo, se usa el número de caja
+        const imageMapping = {
+            // Ejemplo: CMEX-001 a CMEX-010 usan la misma imagen
+            "CMEX-001": "CMEX-001",
+            "CMEX-002": "CMEX-001",  // Usa imagen de CMEX-001
+            "CMEX-003": "CMEX-001",  // Usa imagen de CMEX-001
+            "CMEX-004": "CMEX-001",  // Usa imagen de CMEX-001
+            "CMEX-005": "CMEX-001",  // Usa imagen de CMEX-001
+            "CMEX-006": "CMEX-006",  // Usa su propia imagen
+            "CMEX-007": "CMEX-006",  // Usa imagen de CMEX-006
+            "CMEX-008": "CMEX-006",  // Usa imagen de CMEX-006
+            "CMEX-009": "CMEX-009",  // Usa su propia imagen
+            "CMEX-010": "CMEX-009"   // Usa imagen de CMEX-009
+        };
+
+        // Mapeo de producto (Caja -> Código de Producto) - Nueva función
+        // Formato: "número-caja": "código-producto"
+        // Si existe productMapping, tiene prioridad sobre imageMapping
+        const productMapping = {
+            // Ejemplo: CMEX-001 a CMEX-003 son producto 1169
+            // "CMEX-001": "1169",  // Usa imagen 1169.jpg
+            // "CMEX-002": "1169",  // Usa imagen 1169.jpg
+            // "CMEX-003": "1169",  // Usa imagen 1169.jpg
+            // "CMEX-004": "1170",  // Usa imagen 1170.jpg
+            // "CMEX-005": "1170"   // Usa imagen 1170.jpg
+        };
+
+        // ============================================
+        // 诊断工具（仅在调试时使用）
+        // ============================================
+
+        // 在控制台显示系统配置信息
+        function showSystemDiagnostic() {
+            console.log('═══════════════════════════════════════');
+            console.log('📦 系统诊断信息');
+            console.log('═══════════════════════════════════════');
+            console.log('当前箱号:', currentBox);
+            console.log('密码配置:', ACCESS_PASSWORD);
+            console.log('GitHub配置:', {
+                用户名: GITHUB_USERNAME,
+                仓库: GITHUB_REPO,
+                分支: GITHUB_BRANCH,
+                基础URL: GITHUB_BASE_URL
+            });
+            console.log('箱子列表:', packingLists);
+            console.log('产品映射:', productMapping);
+            console.log('图片映射:', imageMapping);
+            console.log('═══════════════════════════════════════');
+        }
+
+        // ============================================
+        // Código del Programa (No es necesario modificar)
+        // ============================================
+
+        // Datos del paquete actual
+        let currentBox = null;
+
+        // 配置验证函数
+        function validateConfiguration() {
+            const errors = [];
+
+            // 验证 packingLists
+            if (!Array.isArray(packingLists) || packingLists.length === 0) {
+                errors.push('packingLists 不能为空');
+            }
+
+            // 验证 productMapping
+            if (productMapping && typeof productMapping !== 'object') {
+                errors.push('productMapping 必须是对象');
+            }
+
+            // 验证 imageMapping
+            if (imageMapping && typeof imageMapping !== 'object') {
+                errors.push('imageMapping 必须是对象');
+            }
+
+            // 验证所有映射的箱子号是否在 packingLists 中
+            if (productMapping) {
+                Object.keys(productMapping).forEach(boxNumber => {
+                    if (!packingLists.includes(boxNumber)) {
+                        errors.push(`productMapping 中的箱子号 ${boxNumber} 不在 packingLists 中`);
+                    }
+                });
+            }
+
+            if (imageMapping) {
+                Object.keys(imageMapping).forEach(boxNumber => {
+                    if (!packingLists.includes(boxNumber)) {
+                        errors.push(`imageMapping 中的箱子号 ${boxNumber} 不在 packingLists 中`);
+                    }
+                });
+            }
+
+            // 如果有错误，显示警告
+            if (errors.length > 0) {
+                console.warn('配置验证警告：', errors);
+            }
+
+            return errors.length === 0;
+        }
+
+        // Ejecutar cuando la página carga
+        window.onload = function() {
+            // 验证配置
+            validateConfiguration();
+
+            // Obtener número de paquete de la URL
+            const urlParams = new URLSearchParams(window.location.search);
+            let boxNumber = urlParams.get('box');
+
+            // Convertir a mayúsculas para ignorar mayúsculas/minúsculas
+            if (boxNumber) {
+                boxNumber = boxNumber.toUpperCase();
+            }
+
+            // Depuración: Mostrar el número de paquete recibido
+            console.log('Número de paquete recibido:', boxNumber);
+            console.log('Número de paquete original (URL):', urlParams.get('box'));
+            console.log('Lista de paquetes disponibles:', packingLists);
+
+            if (boxNumber) {
+                // Buscar datos del paquete correspondiente (ignorando mayúsculas/minúsculas)
+                currentBox = packingLists.find(box => box.toUpperCase() === boxNumber);
+
+                if (currentBox) {
+                    // Mostrar información del paquete
+                    document.getElementById('boxInfo').textContent = `📦 ${currentBox}`;
+                    document.getElementById('boxInfo').style.background = 'linear-gradient(135deg, #27ae60 0%, #2ecc71 100%)';
+                    console.log('Paquete encontrado:', currentBox);
+                } else {
+                    // Número de paquete no encontrado
+                    document.getElementById('boxInfo').textContent = `❌ Paquete No Encontrado: ${boxNumber}`;
+                    document.getElementById('boxInfo').style.background = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)';
+                    document.getElementById('message').innerHTML = '<p class="error">Número de paquete inválido. Por favor contacte al remitente.</p>';
+                    console.log('Paquete no encontrado en la lista');
+                }
+            } else {
+                // No se proporcionó número de paquete
+                document.getElementById('boxInfo').textContent = '❌ Sin Número de Paquete';
+                document.getElementById('boxInfo').style.background = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)';
+                document.getElementById('message').innerHTML = '<p class="error">Por favor escanee el código QR correcto.</p>';
+                console.log('No se proporcionó número de paquete en la URL');
+            }
+        };
+
+        // Manejar tecla Enter
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                verifyPassword();
+            }
+        }
+
+        // Verificar contraseña
+        function verifyPassword() {
+            const passwordInput = document.getElementById('password');
+            const password = passwordInput.value.trim();
+            const messageDiv = document.getElementById('message');
+            const imageContainer = document.getElementById('imageContainer');
+
+            // Limpiar contenido anterior
+            messageDiv.innerHTML = '';
+            imageContainer.style.display = 'none';
+            imageContainer.innerHTML = '';
+
+            // Verificar si se encontró el paquete
+            if (!currentBox) {
+                messageDiv.innerHTML = '<p class="error">Número de paquete inválido. Por favor contacte al remitente.</p>';
+                return;
+            }
+
+            // Generar URL de imagen (prioridad: productMapping > imageMapping > número de caja)
+            const imageFormats = ['jpg', 'jpeg', 'png', 'webp'];
+            let imageFile;
+
+            // 1. Primero verificar productMapping (Caja -> Código de Producto)
+            if (productMapping && productMapping[currentBox]) {
+                imageFile = productMapping[currentBox];
+                console.log('Usando productMapping:', currentBox, '->', imageFile);
+            }
+            // 2. Si no existe productMapping, verificar imageMapping (Caja -> Archivo de imagen)
+            else if (imageMapping && imageMapping[currentBox]) {
+                imageFile = imageMapping[currentBox];
+                console.log('Usando imageMapping:', currentBox, '->', imageFile);
+            }
+            // 3. Si no existe ninguno, usar el número de caja
+            else {
+                imageFile = currentBox;
+                console.log('Usando número de caja:', currentBox);
+            }
+
+            // 优先使用 jpg 格式（如果不存在会自动尝试其他格式）
+            let imageUrl = GITHUB_BASE_URL + imageFile + '.jpg';
+
+            // Verificar contraseña
+            if (password === '') {
+                messageDiv.innerHTML = '<p class="error">Por favor ingrese una contraseña.</p>';
+                return;
+            }
+
+            // Comparación de contraseñas (agregar información de depuración)
+            console.log('Contraseña ingresada:', password);
+            console.log('Contraseña correcta:', ACCESS_PASSWORD);
+            console.log('Longitud de contraseña - Ingresada:', password.length, 'Correcta:', ACCESS_PASSWORD.length);
+
+            if (password !== ACCESS_PASSWORD) {
+                messageDiv.innerHTML = '<p class="error">Contraseña incorrecta. Por favor inténtelo de nuevo.</p>';
+                console.log('Verificación de contraseña fallida');
+                console.log('Códigos de caracteres de la contraseña ingresada:', password.split('').map(c => c.charCodeAt(0)).join(', '));
+                console.log('Códigos de caracteres de la contraseña correcta:', ACCESS_PASSWORD.split('').map(c => c.charCodeAt(0)).join(', '));
+                passwordInput.value = ''; // Limpiar entrada de contraseña
+                passwordInput.focus(); // Enfocar en entrada de contraseña
+                return;
+            }
+
+            // Contraseña correcta, mostrar lista de empaque
+            messageDiv.innerHTML = '<p class="success">✅ Contraseña correcta. Cargando lista de empaque...</p>';
+
+            // 预加载图片
+            const img = new Image();
+
+            // 添加跨域属性
+            img.crossOrigin = 'anonymous';
+
+            img.onload = function() {
+                // 图片加载成功
+                messageDiv.innerHTML = '';
+                imageContainer.style.display = 'block';
+                imageContainer.innerHTML = `
+                    <img
+                        src="${imageUrl}"
+                        alt="${currentBox}"
+                        style="max-width: 100%; height: auto; border-radius: 10px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);"
+                    />
+                `;
+                console.log('✅ 图片加载成功:', imageUrl);
+            };
+
+            img.onerror = function() {
+                // 图片加载失败 - 提供详细的错误信息
+                const errorDetails = `
+                    <div style="text-align: left; padding: 10px;">
+                        <p class="error">❌ 图片加载失败</p>
+                        <p style="margin-top: 10px; font-size: 14px;">
+                            <strong>详细信息：</strong><br>
+                            • 箱号：${currentBox}<br>
+                            • 图片文件：${imageFile}.jpg<br>
+                            • 完整URL：<a href="${imageUrl}" target="_blank" style="color: #667eea;">${imageUrl}</a>
+                        </p>
+                        <p style="margin-top: 10px; font-size: 14px; color: #e74c3c;">
+                            <strong>可能的原因：</strong><br>
+                            1. 图片文件不存在于 GitHub 仓库<br>
+                            2. GitHub 用户名配置错误<br>
+                            3. 文件命名不匹配（区分大小写）<br>
+                            4. 仓库未公开或 GitHub Raw 访问受限
+                        </p>
+                        <p style="margin-top: 10px; font-size: 12px; color: #666;">
+                            请联系管理员检查配置和图片文件。
+                        </p>
+                    </div>
+                `;
+                messageDiv.innerHTML = errorDetails;
+                imageContainer.style.display = 'block';
+                imageContainer.innerHTML = `
+                    <img
+                        src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE2IiBmaWxsPSIjOTk5Ij7ogY7liLDmlrDliIblj7fwn548L3RleHQ+PC9zdmc+"
+                        alt="Error al cargar imagen"
+                        style="border-radius: 10px;"
+                    />
+                `;
+                console.error('❌ 图片加载失败:', imageUrl);
+                console.error('请检查：', {
+                    '当前箱号': currentBox,
+                    '图片文件': imageFile + '.jpg',
+                    '完整URL': imageUrl,
+                    'GitHub用户名': GITHUB_USERNAME,
+                    '仓库名': GITHUB_REPO
+                });
+            };
+
+            img.src = imageUrl;
+        }
+    </script>
+</body>
+</html>
