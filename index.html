@@ -195,43 +195,51 @@
         // Configuración de Datos de Lista de Empaque
         // Soporta múltiples formatos de imagen: jpg, jpeg, png, webp
         // Ignora mayúsculas y minúsculas en el número de paquete
-        // Ejemplo: GITHUB_BASE_URL + "CMEX-001" + ".jpg"
+        // Soporta múltiples cajas con la misma imagen usando imageMapping
+
+        // Lista de números de paquete
         const packingLists = [
-            {
-                boxNumber: "CMEX-001",
-                imageUrl: GITHUB_BASE_URL + "CMEX-001.jpg",  // Cambiar extensión según formato: .jpg, .jpeg, .png, .webp
-                productList: "Producto A×100, Producto B×50",
-                shipDate: "2026-01-19",
-                totalWeight: "25.5kg",
-                notes: "Frágil, manejar con cuidado"
-            },
-            {
-                boxNumber: "CMEX-002",
-                imageUrl: GITHUB_BASE_URL + "CMEX-002.jpg",
-                productList: "Producto C×80, Producto D×120",
-                shipDate: "2026-01-19",
-                totalWeight: "30.2kg",
-                notes: "Mantener seco"
-            },
-            {
-                boxNumber: "CMEX-003",
-                imageUrl: GITHUB_BASE_URL + "CMEX-003.jpg",
-                productList: "Producto E×150",
-                shipDate: "2026-01-19",
-                totalWeight: "20.8kg",
-                notes: ""
-            }
-            // Agregue más paquetes copiando el formato anterior
-            // Por ejemplo:
-            // {
-            //     boxNumber: "CMEX-004",
-            //     imageUrl: GITHUB_BASE_URL + "CMEX-004.jpg",  // O .png, .jpeg, .webp según formato
-            //     productList: "Producto F×200",
-            //     shipDate: "2026-01-19",
-            //     totalWeight: "15.0kg",
-            //     notes: ""
-            // }
+            "CMEX-001",
+            "CMEX-002",
+            "CMEX-003",
+            "CMEX-004",
+            "CMEX-005",
+            "CMEX-006",
+            "CMEX-007",
+            "CMEX-008",
+            "CMEX-009",
+            "CMEX-010"
+            // Agregue más números de paquete
         ];
+
+        // Mapeo de imágenes - Permite múltiples cajas con la misma imagen
+        // Formato: "número-caja": "nombre-archivo"
+        // Si no se encuentra en el mapeo, se usa el número de caja
+        const imageMapping = {
+            // Ejemplo: CMEX-001 a CMEX-010 usan la misma imagen
+            "CMEX-001": "CMEX-001",
+            "CMEX-002": "CMEX-001",  // Usa imagen de CMEX-001
+            "CMEX-003": "CMEX-001",  // Usa imagen de CMEX-001
+            "CMEX-004": "CMEX-001",  // Usa imagen de CMEX-001
+            "CMEX-005": "CMEX-001",  // Usa imagen de CMEX-001
+            "CMEX-006": "CMEX-006",  // Usa su propia imagen
+            "CMEX-007": "CMEX-006",  // Usa imagen de CMEX-006
+            "CMEX-008": "CMEX-006",  // Usa imagen de CMEX-006
+            "CMEX-009": "CMEX-009",  // Usa su propia imagen
+            "CMEX-010": "CMEX-009"   // Usa imagen de CMEX-009
+        };
+
+        // Mapeo de producto (Caja -> Código de Producto) - Nueva función
+        // Formato: "número-caja": "código-producto"
+        // Si existe productMapping, tiene prioridad sobre imageMapping
+        const productMapping = {
+            // Ejemplo: CMEX-001 a CMEX-003 son producto 1169
+            // "CMEX-001": "1169",  // Usa imagen 1169.jpg
+            // "CMEX-002": "1169",  // Usa imagen 1169.jpg
+            // "CMEX-003": "1169",  // Usa imagen 1169.jpg
+            // "CMEX-004": "1170",  // Usa imagen 1170.jpg
+            // "CMEX-005": "1170"   // Usa imagen 1170.jpg
+        };
 
         // ============================================
         // Código del Programa (No es necesario modificar)
@@ -254,17 +262,17 @@
             // Depuración: Mostrar el número de paquete recibido
             console.log('Número de paquete recibido:', boxNumber);
             console.log('Número de paquete original (URL):', urlParams.get('box'));
-            console.log('Lista de paquetes disponibles:', packingLists.map(b => b.boxNumber));
+            console.log('Lista de paquetes disponibles:', packingLists);
 
             if (boxNumber) {
                 // Buscar datos del paquete correspondiente (ignorando mayúsculas/minúsculas)
-                currentBox = packingLists.find(box => box.boxNumber.toUpperCase() === boxNumber);
+                currentBox = packingLists.find(box => box.toUpperCase() === boxNumber);
 
                 if (currentBox) {
                     // Mostrar información del paquete
-                    document.getElementById('boxInfo').textContent = `📦 ${currentBox.boxNumber}`;
+                    document.getElementById('boxInfo').textContent = `📦 ${currentBox}`;
                     document.getElementById('boxInfo').style.background = 'linear-gradient(135deg, #27ae60 0%, #2ecc71 100%)';
-                    console.log('Paquete encontrado:', currentBox.boxNumber);
+                    console.log('Paquete encontrado:', currentBox);
                 } else {
                     // Número de paquete no encontrado
                     document.getElementById('boxInfo').textContent = `❌ Paquete No Encontrado: ${boxNumber}`;
@@ -306,6 +314,28 @@
                 return;
             }
 
+            // Generar URL de imagen (prioridad: productMapping > imageMapping > número de caja)
+            const imageFormats = ['jpg', 'jpeg', 'png', 'webp'];
+            let imageFile;
+
+            // 1. Primero verificar productMapping (Caja -> Código de Producto)
+            if (productMapping && productMapping[currentBox]) {
+                imageFile = productMapping[currentBox];
+                console.log('Usando productMapping:', currentBox, '->', imageFile);
+            }
+            // 2. Si no existe productMapping, verificar imageMapping (Caja -> Archivo de imagen)
+            else if (imageMapping && imageMapping[currentBox]) {
+                imageFile = imageMapping[currentBox];
+                console.log('Usando imageMapping:', currentBox, '->', imageFile);
+            }
+            // 3. Si no existe ninguno, usar el número de caja
+            else {
+                imageFile = currentBox;
+                console.log('Usando número de caja:', currentBox);
+            }
+
+            let imageUrl = GITHUB_BASE_URL + imageFile + '.jpg'; // Usar formato jpg por defecto
+
             // Verificar contraseña
             if (password === '') {
                 messageDiv.innerHTML = '<p class="error">Por favor ingrese una contraseña.</p>';
@@ -338,8 +368,8 @@
                 imageContainer.style.display = 'block';
                 imageContainer.innerHTML = `
                     <img
-                        src="${currentBox.imageUrl}"
-                        alt="${currentBox.boxNumber}"
+                        src="${imageUrl}"
+                        alt="${currentBox}"
                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE2IiBmaWxsPSIjOTk5Ij7ogY7liLDmlrDliIblj7fwn548L3RleHQ+PC9zdmc+';
                         this.alt='Error al cargar imagen';"
                     />
