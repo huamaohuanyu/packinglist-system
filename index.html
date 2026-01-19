@@ -1,244 +1,166 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>装箱单查询</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>装箱单查看系统</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
+            font-family: 'Segoe UI', Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
         .container {
             background: white;
-            padding: 30px;
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 500px;
+            overflow: hidden;
         }
-        h1 {
-            color: #2d3748;
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
             text-align: center;
+        }
+        .header h1 {
+            font-size: 24px;
             margin-bottom: 10px;
         }
-        .subtitle {
-            text-align: center;
-            color: #718096;
-            margin-bottom: 20px;
+        .header .box-info {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 14px;
+        }
+        .content {
+            padding: 40px;
         }
         .input-group {
-            margin: 20px 0;
+            margin-bottom: 25px;
         }
-        label {
+        .input-group label {
             display: block;
-            color: #4a5568;
-            font-weight: bold;
             margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
         }
-        input {
+        .input-group input {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
             font-size: 16px;
-            box-sizing: border-box;
+            transition: border-color 0.3s;
         }
-        input:focus {
+        .input-group input:focus {
             outline: none;
             border-color: #667eea;
         }
-        button {
+        .btn {
             width: 100%;
-            padding: 12px;
+            padding: 16px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
             cursor: pointer;
-            margin-top: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-        button:hover {
-            opacity: 0.9;
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
         }
-        button:active {
-            transform: translateY(2px);
+        .btn:active {
+            transform: translateY(0);
         }
         .error {
-            color: #e53e3e;
-            background: #fed7d7;
-            padding: 12px;
-            border-radius: 8px;
-            margin: 10px 0;
+            color: #ff4757;
             text-align: center;
-        }
-        .success {
-            color: #38a169;
-            background: #c6f6d5;
-            padding: 12px;
-            border-radius: 8px;
-            margin: 10px 0;
-            text-align: center;
+            margin-top: 15px;
+            display: none;
         }
         .image-container {
-            margin-top: 20px;
+            display: none;
+            margin-top: 30px;
             text-align: center;
         }
         .image-container img {
             max-width: 100%;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
-        .info-box {
-            background: #f7fafc;
-            border-left: 4px solid #667eea;
-            padding: 12px;
-            margin-top: 15px;
-            border-radius: 4px;
-            text-align: left;
+        .hidden {
+            display: none;
         }
-        .info-box strong {
-            color: #2d3748;
+        .loading {
+            text-align: center;
+            padding: 20px;
+            display: none;
         }
-        @media (max-width: 480px) {
-            body { padding: 10px; }
-            .container { padding: 20px; }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>📦 装箱单查询</h1>
-        <p class="subtitle">请输入箱号和密码查看装箱单</p>
-
-        <div class="input-group">
-            <label>箱号</label>
-            <input type="text" id="boxNumber" placeholder="如: BOX-001" autocomplete="off">
+        <div class="header">
+            <h1>📦 装箱单查看系统</h1>
+            <div class="box-info" id="boxInfo">正在识别箱子信息...</div>
         </div>
-
-        <div class="input-group">
-            <label>密码</label>
-            <input type="password" id="password" placeholder="请输入密码" autocomplete="off">
+        
+        <div class="content">
+            <!-- 密码输入区域 -->
+            <div id="passwordSection">
+                <div class="input-group">
+                    <label for="password">请输入查看密码：</label>
+                    <input type="password" id="password" placeholder="输入密码后按回车或点击确认">
+                </div>
+                <button class="btn" onclick="checkPassword()">确认查看</button>
+                <div class="error" id="errorMsg">密码错误，请重新输入</div>
+            </div>
+            
+            <!-- 加载动画 -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>正在加载装箱单...</p>
+            </div>
+            
+            <!-- 图片显示区域 -->
+            <div class="image-container" id="imageContainer">
+                <img id="packingImage" src="" alt="装箱单">
+                <div style="margin-top: 15px; color: #666; font-size: 14px;">
+                    图片加载完成，您可以长按保存或截图
+                </div>
+            </div>
         </div>
-
-        <button onclick="queryPackingList()">查询装箱单</button>
-
-        <div id="message"></div>
-        <div id="imageContainer" class="image-container"></div>
-        <div id="infoBox" class="info-box" style="display: none;"></div>
     </div>
-
-    <script>
-        // 从 URL 获取参数
-        const urlParams = new URLSearchParams(window.location.search);
-        const boxParam = urlParams.get('box');
-        const pwParam = urlParams.get('pw');
-
-        // 自动填充
-        if (boxParam) document.getElementById('boxNumber').value = boxParam;
-        if (pwParam) document.getElementById('password').value = pwParam;
-
-        // 自动查询
-        if (boxParam && pwParam) {
-            queryPackingList();
-        }
-
-        // =========================================
-        // 装箱单数据配置
-        // =========================================
-        // 使用说明：
-        // 1. 将图片上传到 GitHub 的 images 文件夹
-        // 2. 修改下面的数据，添加你的装箱单信息
-        // 3. 图片链接格式：
-        //    https://raw.githubusercontent.com/你的GitHub用户名/你的仓库名/main/images/图片文件名
-        // =========================================
-
-        const packingLists = {
-            // 示例数据（请根据实际情况修改）
-            'BOX-001': {
-                password: '123456',
-                imageUrl: 'https://raw.githubusercontent.com/你的用户名/packinglist-system/main/images/BOX-001.jpg',
-                products: '货号A×100, 货号B×50',
-                weight: '25.5 kg',
-                notes: '易碎品，请轻拿轻放'
-            },
-            'BOX-002': {
-                password: '123456',
-                imageUrl: 'https://raw.githubusercontent.com/你的用户名/packinglist-system/main/images/BOX-002.jpg',
-                products: '货号C×80, 货号D×40',
-                weight: '18.3 kg',
-                notes: ''
-            },
-            'BOX-003': {
-                password: '123456',
-                imageUrl: 'https://raw.githubusercontent.com/你的用户名/packinglist-system/main/images/BOX-003.jpg',
-                products: '货号E×120',
-                weight: '30.0 kg',
-                notes: ''
-            }
-            // 在这里添加更多箱子...
-            // 'BOX-004': { ... },
-            // 'BOX-005': { ... },
-        };
-
-        function queryPackingList() {
-            const boxNumber = document.getElementById('boxNumber').value.trim().toUpperCase();
-            const password = document.getElementById('password').value.trim();
-            const messageDiv = document.getElementById('message');
-            const imageContainer = document.getElementById('imageContainer');
-            const infoBox = document.getElementById('infoBox');
-
-            if (!boxNumber || !password) {
-                messageDiv.innerHTML = '<div class="error">❌ 请输入箱号和密码</div>';
-                imageContainer.innerHTML = '';
-                infoBox.style.display = 'none';
-                return;
-            }
-
-            const data = packingLists[boxNumber];
-
-            if (!data) {
-                messageDiv.innerHTML = '<div class="error">❌ 箱号不存在</div>';
-                imageContainer.innerHTML = '';
-                infoBox.style.display = 'none';
-                return;
-            }
-
-            if (data.password !== password) {
-                messageDiv.innerHTML = '<div class="error">❌ 密码错误</div>';
-                imageContainer.innerHTML = '';
-                infoBox.style.display = 'none';
-                return;
-            }
-
-            // 显示图片
-            messageDiv.innerHTML = '<div class="success">✅ 查询成功！</div>';
-            imageContainer.innerHTML = `<img src="${data.imageUrl}" alt="${boxNumber}">`;
-
-            // 显示详细信息
-            let infoHtml = `<strong>📦 箱号：</strong> ${boxNumber}<br>`;
-            infoHtml += `<strong>📋 产品清单：</strong> ${data.products}<br>`;
-            if (data.weight) {
-                infoHtml += `<strong>⚖️ 总重量：</strong> ${data.weight}<br>`;
-            }
-            if (data.notes) {
-                infoHtml += `<strong>📝 备注：</strong> ${data.notes}`;
-            }
-
-            infoBox.innerHTML = infoHtml;
-            infoBox.style.display = 'block';
-        }
-
-        // 支持回车键查询
-        document.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                queryPackingList();
-            }
-        });
-    </script>
+    
+    <script src="script.js"></script>
 </body>
 </html>
