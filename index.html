@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>装箱单查询系统</title>
+    <title>Packing List System</title>
     <style>
         * {
             margin: 0;
@@ -130,29 +130,6 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .info-section {
-            margin-top: 30px;
-            text-align: left;
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 10px;
-        }
-
-        .info-section h3 {
-            color: #667eea;
-            margin-bottom: 15px;
-        }
-
-        .info-section p {
-            margin: 10px 0;
-            color: #666;
-        }
-
-        .info-section .label {
-            font-weight: bold;
-            color: #333;
-        }
-
         @media (max-width: 600px) {
             .container {
                 padding: 20px;
@@ -175,187 +152,186 @@
 </head>
 <body>
     <div class="container">
-        <h1>📦 装箱单查询系统</h1>
+        <h1>📦 Packing List System</h1>
         
-        <!-- 箱号信息区域（自动显示） -->
+        <!-- Box Number Information (automatically displayed) -->
         <div class="box-info" id="boxInfo">
-            正在加载箱号信息...
+            Loading box information...
         </div>
         
-        <!-- 密码输入区域 -->
+        <!-- Password Input -->
         <div class="input-group">
-            <label for="password">请输入访问密码</label>
+            <label for="password">Enter Access Password</label>
             <input 
                 type="password" 
                 id="password" 
-                placeholder="输入密码"
+                placeholder="Enter password"
                 onkeypress="handleKeyPress(event)"
             >
         </div>
         
-        <button onclick="verifyPassword()">查看装箱单</button>
+        <button onclick="verifyPassword()">View Packing List</button>
         
         <div id="message" class="message"></div>
         
-        <!-- 图片显示区域 -->
+        <!-- Image Display Area -->
         <div id="imageContainer" class="image-container" style="display: none;"></div>
-        
-        <!-- 详细信息区域 -->
-        <div id="infoSection" class="info-section" style="display: none;"></div>
     </div>
 
     <script>
         // ============================================
-        // 配置区域 - 你需要修改这里的数据
+        // Configuration Area - Modify the data here
         // ============================================
-        
-        // 访问密码（修改这里即可更改密码）
+
+        // Access Password (modify here to change password)
         const ACCESS_PASSWORD = "123456";
-        
-        // 装箱单数据配置
-        // 注意：imageUrl 是你在 GitHub 仓库中上传图片后的实际链接
-        // 你可以从 GitHub 复制图片链接，然后替换下面的示例链接
+
+        // GitHub Configuration (modify username only, all image links will be auto-generated)
+        const GITHUB_USERNAME = "huamaohuanyu";  // ⚠️ Change to your GitHub username
+        const GITHUB_REPO = "packinglist-system";    // Repository name (usually no need to change)
+        const GITHUB_BRANCH = "main";              // Branch name (main or master, usually no need to change)
+        const GITHUB_BASE_URL = `https://github.com/${GITHUB_USERNAME}/${GITHUB_REPO}/raw/${GITHUB_BRANCH}/images/`;
+
+        // Packing List Data Configuration
+        // Image link format: GITHUB_BASE_URL + box number + ".jpg"
+        // Example: GITHUB_BASE_URL + "BOX-001" + ".jpg"
         const packingLists = [
             {
                 boxNumber: "BOX-001",
-                imageUrl: "https://github.com/huamaohuanyu/packinglist-system/raw/main/images/BOX-001.jpg",
-                productList: "货号A×100, 货号B×50",
+                imageUrl: GITHUB_BASE_URL + "BOX-001.jpg",
+                productList: "Item A×100, Item B×50",
                 shipDate: "2026-01-19",
                 totalWeight: "25.5kg",
-                notes: "易碎品，请轻拿轻放"
+                notes: "Fragile, handle with care"
             },
             {
                 boxNumber: "BOX-002",
-                imageUrl: "https://github.com/你的用户名/packinglist-system/raw/main/images/BOX-002.jpg",
-                productList: "货号C×80, 货号D×120",
+                imageUrl: GITHUB_BASE_URL + "BOX-002.jpg",
+                productList: "Item C×80, Item D×120",
                 shipDate: "2026-01-19",
                 totalWeight: "30.2kg",
-                notes: "保持干燥"
+                notes: "Keep dry"
             },
             {
                 boxNumber: "BOX-003",
-                imageUrl: "https://github.com/你的用户名/packinglist-system/raw/main/images/BOX-003.jpg",
-                productList: "货号E×150",
+                imageUrl: GITHUB_BASE_URL + "BOX-003.jpg",
+                productList: "Item E×150",
                 shipDate: "2026-01-19",
                 totalWeight: "20.8kg",
                 notes: ""
             }
-            // 添加更多箱子，复制上面的格式即可
+            // Add more boxes by copying the format above
+            // For example:
+            // {
+            //     boxNumber: "BOX-004",
+            //     imageUrl: GITHUB_BASE_URL + "BOX-004.jpg",
+            //     productList: "Item F×200",
+            //     shipDate: "2026-01-19",
+            //     totalWeight: "15.0kg",
+            //     notes: ""
+            // }
         ];
         
         // ============================================
-        // 程序代码（不需要修改）
+        // Program Code (No need to modify)
         // ============================================
-        
-        // 当前箱子数据
+
+        // Current box data
         let currentBox = null;
-        
-        // 页面加载完成后执行
+
+        // Execute when page loads
         window.onload = function() {
-            // 从 URL 中获取箱号
+            // Get box number from URL
             const urlParams = new URLSearchParams(window.location.search);
             const boxNumber = urlParams.get('box');
-            
+
             if (boxNumber) {
-                // 查找对应箱子的数据
+                // Find corresponding box data
                 currentBox = packingLists.find(box => box.boxNumber === boxNumber);
-                
+
                 if (currentBox) {
-                    // 显示箱号信息
+                    // Display box information
                     document.getElementById('boxInfo').textContent = `📦 ${currentBox.boxNumber}`;
                     document.getElementById('boxInfo').style.background = 'linear-gradient(135deg, #27ae60 0%, #2ecc71 100%)';
                 } else {
-                    // 箱号不存在
-                    document.getElementById('boxInfo').textContent = `❌ 未找到箱号: ${boxNumber}`;
+                    // Box number not found
+                    document.getElementById('boxInfo').textContent = `❌ Box Not Found: ${boxNumber}`;
                     document.getElementById('boxInfo').style.background = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)';
-                    document.getElementById('message').innerHTML = '<p class="error">无效的箱号，请联系发货方</p>';
+                    document.getElementById('message').innerHTML = '<p class="error">Invalid box number. Please contact the shipper.</p>';
                 }
             } else {
-                // 没有提供箱号
-                document.getElementById('boxInfo').textContent = '❌ 未提供箱号';
+                // No box number provided
+                document.getElementById('boxInfo').textContent = '❌ No Box Number Provided';
                 document.getElementById('boxInfo').style.background = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)';
-                document.getElementById('message').innerHTML = '<p class="error">请扫描正确的二维码</p>';
+                document.getElementById('message').innerHTML = '<p class="error">Please scan the correct QR code.</p>';
             }
         };
-        
-        // 处理回车键
+
+        // Handle Enter key
         function handleKeyPress(event) {
             if (event.key === 'Enter') {
                 verifyPassword();
             }
         }
-        
-        // 验证密码
+
+        // Verify password
         function verifyPassword() {
             const passwordInput = document.getElementById('password');
             const password = passwordInput.value.trim();
             const messageDiv = document.getElementById('message');
             const imageContainer = document.getElementById('imageContainer');
-            const infoSection = document.getElementById('infoSection');
-            
-            // 清空之前的内容
+
+            // Clear previous content
             messageDiv.innerHTML = '';
             imageContainer.style.display = 'none';
             imageContainer.innerHTML = '';
-            infoSection.style.display = 'none';
-            infoSection.innerHTML = '';
-            
-            // 检查是否找到箱子
+
+            // Check if box was found
             if (!currentBox) {
-                messageDiv.innerHTML = '<p class="error">无效的箱号，请联系发货方</p>';
+                messageDiv.innerHTML = '<p class="error">Invalid box number. Please contact the shipper.</p>';
                 return;
             }
-            
-            // 检查密码
+
+            // Check password
             if (password === '') {
-                messageDiv.innerHTML = '<p class="error">请输入密码</p>';
+                messageDiv.innerHTML = '<p class="error">Please enter a password.</p>';
                 return;
             }
-            
-            // 密码比较（添加调试信息）
-            console.log('输入的密码:', password);
-            console.log('正确的密码:', ACCESS_PASSWORD);
-            console.log('密码长度 - 输入:', password.length, '正确:', ACCESS_PASSWORD.length);
-            
+
+            // Password comparison (add debug info)
+            console.log('Entered password:', password);
+            console.log('Correct password:', ACCESS_PASSWORD);
+            console.log('Password length - Entered:', password.length, 'Correct:', ACCESS_PASSWORD.length);
+
             if (password !== ACCESS_PASSWORD) {
-                messageDiv.innerHTML = '<p class="error">密码错误，请重新输入</p>';
-                console.log('密码验证失败');
-                console.log('输入密码的字符编码:', password.split('').map(c => c.charCodeAt(0)).join(', '));
-                console.log('正确密码的字符编码:', ACCESS_PASSWORD.split('').map(c => c.charCodeAt(0)).join(', '));
-                passwordInput.value = ''; // 清空密码输入框
-                passwordInput.focus(); // 聚焦到密码输入框
+                messageDiv.innerHTML = '<p class="error">Incorrect password. Please try again.</p>';
+                console.log('Password verification failed');
+                console.log('Character codes of entered password:', password.split('').map(c => c.charCodeAt(0)).join(', '));
+                console.log('Character codes of correct password:', ACCESS_PASSWORD.split('').map(c => c.charCodeAt(0)).join(', '));
+                passwordInput.value = ''; // Clear password input
+                passwordInput.focus(); // Focus on password input
                 return;
             }
-            
-            // 密码正确，显示装箱单
-            messageDiv.innerHTML = '<p class="success">✅ 密码正确，正在加载装箱单...</p>';
-            
-            // 显示图片
+
+            // Password correct, display packing list
+            messageDiv.innerHTML = '<p class="success">✅ Password correct. Loading packing list...</p>';
+
+            // Display image
             setTimeout(() => {
                 messageDiv.innerHTML = '';
-                
-                // 显示装箱单图片
+
+                // Display packing list image
                 imageContainer.style.display = 'block';
                 imageContainer.innerHTML = `
-                    <img 
-                        src="${currentBox.imageUrl}" 
-                        alt="${currentBox.boxNumber}" 
-                        onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE2IiBmaWxsPSIjOTk5Ij7ogY7liLDmlrDliIblj7fwn548L3RleHQ+PC9zdmc+'; 
-                        this.alt='图片加载失败';"
+                    <img
+                        src="${currentBox.imageUrl}"
+                        alt="${currentBox.boxNumber}"
+                        onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE2IiBmaWxsPSIjOTk5Ij7ogY7liLDmlrDliIblj7fwn548L3RleHQ+PC9zdmc+';
+                        this.alt='Image failed to load';"
                     />
                 `;
-                
-                // 显示详细信息（可选，因为图片已经包含所有信息）
-                infoSection.style.display = 'block';
-                infoSection.innerHTML = `
-                    <h3>📋 箱号信息</h3>
-                    <p><span class="label">箱号：</span>${currentBox.boxNumber}</p>
-                    ${currentBox.shipDate ? `<p><span class="label">发货日期：</span>${currentBox.shipDate}</p>` : ''}
-                    ${currentBox.totalWeight ? `<p><span class="label">总重量：</span>${currentBox.totalWeight}</p>` : ''}
-                    ${currentBox.notes ? `<p><span class="label">备注：</span>${currentBox.notes}</p>` : ''}
-                `;
-                
-            }, 500); // 延迟 500ms 显示，让用户看到成功提示
+
+            }, 500); // Delay 500ms to show success message
         }
     </script>
 </body>
