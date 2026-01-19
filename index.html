@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Packing List System</title>
+    <title>Sistema de Lista de Empaque</title>
     <style>
         * {
             margin: 0;
@@ -152,41 +152,41 @@
 </head>
 <body>
     <div class="container">
-        <h1>📦 Packing List System</h1>
-        
-        <!-- Box Number Information (automatically displayed) -->
+        <h1>📦 Sistema de Lista de Empaque</h1>
+
+        <!-- Información del número de paquete (mostrada automáticamente) -->
         <div class="box-info" id="boxInfo">
-            Loading box information...
+            Cargando información del paquete...
         </div>
-        
-        <!-- Password Input -->
+
+        <!-- Entrada de contraseña -->
         <div class="input-group">
-            <label for="password">Enter Access Password</label>
-            <input 
-                type="password" 
-                id="password" 
-                placeholder="Enter password"
+            <label for="password">Ingrese la Contraseña de Acceso</label>
+            <input
+                type="password"
+                id="password"
+                placeholder="Ingrese contraseña"
                 onkeypress="handleKeyPress(event)"
             >
         </div>
-        
-        <button onclick="verifyPassword()">View Packing List</button>
-        
+
+        <button onclick="verifyPassword()">Ver Lista de Empaque</button>
+
         <div id="message" class="message"></div>
-        
-        <!-- Image Display Area -->
+
+        <!-- Área de visualización de imágenes -->
         <div id="imageContainer" class="image-container" style="display: none;"></div>
     </div>
 
     <script>
         // ============================================
-        // Configuration Area - Modify the data here
+        // Configuración - Modifique los datos aquí
         // ============================================
 
-        // Access Password (modify here to change password)
+        // Contraseña de acceso (modifique aquí para cambiar la contraseña)
         const ACCESS_PASSWORD = "123456";
 
-        // GitHub Configuration (modify username only, all image links will be auto-generated)
+        // Configuración de GitHub (solo modifique el nombre de usuario, todos los enlaces se generarán automáticamente)
         const GITHUB_USERNAME = "huamaohuanyu";  // ⚠️ Cambie a su nombre de usuario de GitHub
         const GITHUB_REPO = "packinglist-system";    // Nombre del repositorio (generalmente no es necesario cambiar)
         const GITHUB_BRANCH = "main";              // Nombre de la rama (main o master, generalmente no es necesario cambiar)
@@ -231,107 +231,114 @@
             //     notes: ""
             // }
         ];
-        
+
         // ============================================
-        // Program Code (No need to modify)
+        // Código del Programa (No es necesario modificar)
         // ============================================
 
-        // Current box data
+        // Datos del paquete actual
         let currentBox = null;
 
-        // Execute when page loads
+        // Ejecutar cuando la página carga
         window.onload = function() {
-            // Get box number from URL
+            // Obtener número de paquete de la URL
             const urlParams = new URLSearchParams(window.location.search);
             const boxNumber = urlParams.get('box');
 
+            // Depuración: Mostrar el número de paquete recibido
+            console.log('Número de paquete recibido:', boxNumber);
+            console.log('Lista de paquetes disponibles:', packingLists.map(b => b.boxNumber));
+
             if (boxNumber) {
-                // Find corresponding box data
+                // Buscar datos del paquete correspondiente
                 currentBox = packingLists.find(box => box.boxNumber === boxNumber);
 
                 if (currentBox) {
-                    // Display box information
+                    // Mostrar información del paquete
                     document.getElementById('boxInfo').textContent = `📦 ${currentBox.boxNumber}`;
                     document.getElementById('boxInfo').style.background = 'linear-gradient(135deg, #27ae60 0%, #2ecc71 100%)';
+                    console.log('Paquete encontrado:', currentBox.boxNumber);
                 } else {
-                    // Box number not found
-                    document.getElementById('boxInfo').textContent = `❌ Box Not Found: ${boxNumber}`;
+                    // Número de paquete no encontrado
+                    document.getElementById('boxInfo').textContent = `❌ Paquete No Encontrado: ${boxNumber}`;
                     document.getElementById('boxInfo').style.background = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)';
-                    document.getElementById('message').innerHTML = '<p class="error">Invalid box number. Please contact the shipper.</p>';
+                    document.getElementById('message').innerHTML = '<p class="error">Número de paquete inválido. Por favor contacte al remitente.</p>';
+                    console.log('Paquete no encontrado en la lista');
                 }
             } else {
-                // No box number provided
-                document.getElementById('boxInfo').textContent = '❌ No Box Number Provided';
+                // No se proporcionó número de paquete
+                document.getElementById('boxInfo').textContent = '❌ Sin Número de Paquete';
                 document.getElementById('boxInfo').style.background = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)';
-                document.getElementById('message').innerHTML = '<p class="error">Please scan the correct QR code.</p>';
+                document.getElementById('message').innerHTML = '<p class="error">Por favor escanee el código QR correcto.</p>';
+                console.log('No se proporcionó número de paquete en la URL');
             }
         };
 
-        // Handle Enter key
+        // Manejar tecla Enter
         function handleKeyPress(event) {
             if (event.key === 'Enter') {
                 verifyPassword();
             }
         }
 
-        // Verify password
+        // Verificar contraseña
         function verifyPassword() {
             const passwordInput = document.getElementById('password');
             const password = passwordInput.value.trim();
             const messageDiv = document.getElementById('message');
             const imageContainer = document.getElementById('imageContainer');
 
-            // Clear previous content
+            // Limpiar contenido anterior
             messageDiv.innerHTML = '';
             imageContainer.style.display = 'none';
             imageContainer.innerHTML = '';
 
-            // Check if box was found
+            // Verificar si se encontró el paquete
             if (!currentBox) {
-                messageDiv.innerHTML = '<p class="error">Invalid box number. Please contact the shipper.</p>';
+                messageDiv.innerHTML = '<p class="error">Número de paquete inválido. Por favor contacte al remitente.</p>';
                 return;
             }
 
-            // Check password
+            // Verificar contraseña
             if (password === '') {
-                messageDiv.innerHTML = '<p class="error">Please enter a password.</p>';
+                messageDiv.innerHTML = '<p class="error">Por favor ingrese una contraseña.</p>';
                 return;
             }
 
-            // Password comparison (add debug info)
-            console.log('Entered password:', password);
-            console.log('Correct password:', ACCESS_PASSWORD);
-            console.log('Password length - Entered:', password.length, 'Correct:', ACCESS_PASSWORD.length);
+            // Comparación de contraseñas (agregar información de depuración)
+            console.log('Contraseña ingresada:', password);
+            console.log('Contraseña correcta:', ACCESS_PASSWORD);
+            console.log('Longitud de contraseña - Ingresada:', password.length, 'Correcta:', ACCESS_PASSWORD.length);
 
             if (password !== ACCESS_PASSWORD) {
-                messageDiv.innerHTML = '<p class="error">Incorrect password. Please try again.</p>';
-                console.log('Password verification failed');
-                console.log('Character codes of entered password:', password.split('').map(c => c.charCodeAt(0)).join(', '));
-                console.log('Character codes of correct password:', ACCESS_PASSWORD.split('').map(c => c.charCodeAt(0)).join(', '));
-                passwordInput.value = ''; // Clear password input
-                passwordInput.focus(); // Focus on password input
+                messageDiv.innerHTML = '<p class="error">Contraseña incorrecta. Por favor inténtelo de nuevo.</p>';
+                console.log('Verificación de contraseña fallida');
+                console.log('Códigos de caracteres de la contraseña ingresada:', password.split('').map(c => c.charCodeAt(0)).join(', '));
+                console.log('Códigos de caracteres de la contraseña correcta:', ACCESS_PASSWORD.split('').map(c => c.charCodeAt(0)).join(', '));
+                passwordInput.value = ''; // Limpiar entrada de contraseña
+                passwordInput.focus(); // Enfocar en entrada de contraseña
                 return;
             }
 
-            // Password correct, display packing list
-            messageDiv.innerHTML = '<p class="success">✅ Password correct. Loading packing list...</p>';
+            // Contraseña correcta, mostrar lista de empaque
+            messageDiv.innerHTML = '<p class="success">✅ Contraseña correcta. Cargando lista de empaque...</p>';
 
-            // Display image
+            // Mostrar imagen
             setTimeout(() => {
                 messageDiv.innerHTML = '';
 
-                // Display packing list image
+                // Mostrar imagen de lista de empaque
                 imageContainer.style.display = 'block';
                 imageContainer.innerHTML = `
                     <img
                         src="${currentBox.imageUrl}"
                         alt="${currentBox.boxNumber}"
                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE2IiBmaWxsPSIjOTk5Ij7ogY7liLDmlrDliIblj7fwn548L3RleHQ+PC9zdmc+';
-                        this.alt='Image failed to load';"
+                        this.alt='Error al cargar imagen';"
                     />
                 `;
 
-            }, 500); // Delay 500ms to show success message
+            }, 500); // Retraso de 500ms para mostrar mensaje de éxito
         }
     </script>
 </body>
