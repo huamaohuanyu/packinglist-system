@@ -198,7 +198,7 @@
         // Soporta múltiples cajas con la misma imagen usando imageMapping
 
         // Lista de números de paquete
-   const packingLists = [
+const packingLists = [
     "CMEX-001",
     "CMEX-002",
     "CMEX-003",
@@ -206,21 +206,290 @@
     "CMEX-005",
     "CMEX-006",
     "CMEX-007",
-    "CMEX-008"
+    "CMEX-008",
+    "CMEX-009",
+    "CMEX-010",
+    "CMEX-011",
+    "CMEX-012",
+    "CMEX-013",
+    "CMEX-014",
+    "CMEX-015",
+    "CMEX-016",
+    "CMEX-017",
+    "CMEX-018",
+    "CMEX-019",
+    "CMEX-020",
+    "CMEX-021",
+    "CMEX-022",
+    "CMEX-023",
+    "CMEX-024",
+    "CMEX-025",
+    "CMEX-026",
+    "CMEX-027",
+    "CMEX-028",
+    "CMEX-029",
+    "CMEX-030",
+    "CMEX-031",
+    "CMEX-032",
+    "CMEX-033",
+    "CMEX-034",
+    "CMEX-035",
+    "CMEX-036",
+    "CMEX-037",
+    "CMEX-038",
+    "CMEX-039",
+    "CMEX-040",
+    "CMEX-041",
+    "CMEX-042",
+    "CMEX-043",
+    "CMEX-044",
+    "CMEX-045",
+    "CMEX-046",
+    "CMEX-047",
+    "CMEX-048",
+    "CMEX-049",
+    "CMEX-050",
+    "CMEX-051",
+    "CMEX-052",
+    "CMEX-053",
+    "CMEX-054",
+    "CMEX-055",
+    "CMEX-056",
+    "CMEX-057",
+    "CMEX-058",
+    "CMEX-059",
+    "CMEX-060",
+    "CMEX-061",
+    "CMEX-062",
+    "CMEX-063",
+    "CMEX-064",
+    "CMEX-065",
+    "CMEX-066",
+    "CMEX-067",
+    "CMEX-068",
+    "CMEX-069",
+    "CMEX-070",
+    "CMEX-071",
+    "CMEX-072",
+    "CMEX-073",
+    "CMEX-074",
+    "CMEX-075",
+    "CMEX-076",
+    "CMEX-077",
+    "CMEX-078",
+    "CMEX-079",
+    "CMEX-080",
+    "CMEX-081",
+    "CMEX-082",
+    "CMEX-083",
+    "CMEX-084",
+    "CMEX-085",
+    "CMEX-086",
+    "CMEX-087",
+    "CMEX-088",
+    "CMEX-089",
+    "CMEX-090",
+    "CMEX-091",
+    "CMEX-092",
+    "CMEX-093",
+    "CMEX-094",
+    "CMEX-095",
+    "CMEX-096",
+    "CMEX-097",
+    "CMEX-098",
+    "CMEX-099",
+    "CMEX-100",
+    "CMEX-101",
+    "CMEX-102",
+    "CMEX-103",
+    "CMEX-104",
+    "CMEX-105",
+    "CMEX-106",
+    "CMEX-107",
+    "CMEX-108",
+    "CMEX-109",
+    "CMEX-110",
+    "CMEX-111",
+    "CMEX-112",
+    "CMEX-113",
+    "CMEX-114",
+    "CMEX-115",
+    "CMEX-116",
+    "CMEX-117",
+    "CMEX-118",
+    "CMEX-119",
+    "CMEX-120",
+    "CMEX-121",
+    "CMEX-122",
+    "CMEX-123",
+    "CMEX-124",
+    "CMEX-125",
+    "CMEX-126",
+    "CMEX-127",
+    "CMEX-128",
+    "CMEX-129",
+    "CMEX-130",
+    "CMEX-131",
+    "CMEX-132",
+    "CMEX-133",
+    "CMEX-134",
+    "CMEX-135",
+    "CMEX-136",
+    "CMEX-137",
+    "CMEX-138",
+    "CMEX-139",
+    "CMEX-140",
+    "CMEX-141",
+    "CMEX-142"
 ];
 
+// Mapeo de producto (Caja -> Código de Producto)
+// 142 cajas, 16 productos únicos
 const productMapping = {
-    "CMEX-001": "1169",
-    "CMEX-002": "1169",
-    "CMEX-003": "9902",
-    "CMEX-004": "9902",
-    "CMEX-005": "8860",
-    "CMEX-006": "8860",
-    "CMEX-007": "8001",
-    "CMEX-008": "8001"
+    "CMEX-001": "6604",  // Producto: 6604
+    "CMEX-002": "6604",  // Producto: 6604
+    "CMEX-003": "6604",  // Producto: 6604
+    "CMEX-004": "6604",  // Producto: 6604
+    "CMEX-005": "6604",  // Producto: 6604
+    "CMEX-006": "6604",  // Producto: 6604
+    "CMEX-007": "6604",  // Producto: 6604
+    "CMEX-008": "6604",  // Producto: 6604
+    "CMEX-009": "6604",  // Producto: 6604
+    "CMEX-010": "6604",  // Producto: 6604
+    "CMEX-011": "9901",  // Producto: 9901
+    "CMEX-012": "9901",  // Producto: 9901
+    "CMEX-013": "9901",  // Producto: 9901
+    "CMEX-014": "9901",  // Producto: 9901
+    "CMEX-015": "9901",  // Producto: 9901
+    "CMEX-016": "9901",  // Producto: 9901
+    "CMEX-017": "9901",  // Producto: 9901
+    "CMEX-018": "9901",  // Producto: 9901
+    "CMEX-019": "9901",  // Producto: 9901
+    "CMEX-020": "9901",  // Producto: 9901
+    "CMEX-021": "9902",  // Producto: 9902
+    "CMEX-022": "9902",  // Producto: 9902
+    "CMEX-023": "9902",  // Producto: 9902
+    "CMEX-024": "9902",  // Producto: 9902
+    "CMEX-025": "9902",  // Producto: 9902
+    "CMEX-026": "9902",  // Producto: 9902
+    "CMEX-027": "9902",  // Producto: 9902
+    "CMEX-028": "9902",  // Producto: 9902
+    "CMEX-029": "9902",  // Producto: 9902
+    "CMEX-030": "9902",  // Producto: 9902
+    "CMEX-031": "9904",  // Producto: 9904
+    "CMEX-032": "9904",  // Producto: 9904
+    "CMEX-033": "9904",  // Producto: 9904
+    "CMEX-034": "9904",  // Producto: 9904
+    "CMEX-035": "9904",  // Producto: 9904
+    "CMEX-036": "9904",  // Producto: 9904
+    "CMEX-037": "9904",  // Producto: 9904
+    "CMEX-038": "9904",  // Producto: 9904
+    "CMEX-039": "9904",  // Producto: 9904
+    "CMEX-040": "9904",  // Producto: 9904
+    "CMEX-041": "9906",  // Producto: 9906
+    "CMEX-042": "9906",  // Producto: 9906
+    "CMEX-043": "9906",  // Producto: 9906
+    "CMEX-044": "9906",  // Producto: 9906
+    "CMEX-045": "9906",  // Producto: 9906
+    "CMEX-046": "9906",  // Producto: 9906
+    "CMEX-047": "9906",  // Producto: 9906
+    "CMEX-048": "9906",  // Producto: 9906
+    "CMEX-049": "8126",  // Producto: 8126
+    "CMEX-050": "8126",  // Producto: 8126
+    "CMEX-051": "8126",  // Producto: 8126
+    "CMEX-052": "8126",  // Producto: 8126
+    "CMEX-053": "8126",  // Producto: 8126
+    "CMEX-054": "8126",  // Producto: 8126
+    "CMEX-055": "8128",  // Producto: 8128
+    "CMEX-056": "8128",  // Producto: 8128
+    "CMEX-057": "8128",  // Producto: 8128
+    "CMEX-058": "8128",  // Producto: 8128
+    "CMEX-059": "8128",  // Producto: 8128
+    "CMEX-060": "8128",  // Producto: 8128
+    "CMEX-061": "8121",  // Producto: 8121
+    "CMEX-062": "8121",  // Producto: 8121
+    "CMEX-063": "8121",  // Producto: 8121
+    "CMEX-064": "8121",  // Producto: 8121
+    "CMEX-065": "8121",  // Producto: 8121
+    "CMEX-066": "8121",  // Producto: 8121
+    "CMEX-067": "8004",  // Producto: 8004
+    "CMEX-068": "8004",  // Producto: 8004
+    "CMEX-069": "8004",  // Producto: 8004
+    "CMEX-070": "8004",  // Producto: 8004
+    "CMEX-071": "8004",  // Producto: 8004
+    "CMEX-072": "8004",  // Producto: 8004
+    "CMEX-073": "8004",  // Producto: 8004
+    "CMEX-074": "8004",  // Producto: 8004
+    "CMEX-075": "8004",  // Producto: 8004
+    "CMEX-076": "8004",  // Producto: 8004
+    "CMEX-077": "8123",  // Producto: 8123
+    "CMEX-078": "8123",  // Producto: 8123
+    "CMEX-079": "8123",  // Producto: 8123
+    "CMEX-080": "8123",  // Producto: 8123
+    "CMEX-081": "8123",  // Producto: 8123
+    "CMEX-082": "8123",  // Producto: 8123
+    "CMEX-083": "8123",  // Producto: 8123
+    "CMEX-084": "8123",  // Producto: 8123
+    "CMEX-085": "8116",  // Producto: 8116
+    "CMEX-086": "8116",  // Producto: 8116
+    "CMEX-087": "8116",  // Producto: 8116
+    "CMEX-088": "8116",  // Producto: 8116
+    "CMEX-089": "8116",  // Producto: 8116
+    "CMEX-090": "8116",  // Producto: 8116
+    "CMEX-091": "8116",  // Producto: 8116
+    "CMEX-092": "8116",  // Producto: 8116
+    "CMEX-093": "1106",  // Producto: 1106
+    "CMEX-094": "1106",  // Producto: 1106
+    "CMEX-095": "1106",  // Producto: 1106
+    "CMEX-096": "1106",  // Producto: 1106
+    "CMEX-097": "1106",  // Producto: 1106
+    "CMEX-098": "1106",  // Producto: 1106
+    "CMEX-099": "1106",  // Producto: 1106
+    "CMEX-100": "1106",  // Producto: 1106
+    "CMEX-101": "1106",  // Producto: 1106
+    "CMEX-102": "1106",  // Producto: 1106
+    "CMEX-103": "8869",  // Producto: 8869
+    "CMEX-104": "8869",  // Producto: 8869
+    "CMEX-105": "8869",  // Producto: 8869
+    "CMEX-106": "8869",  // Producto: 8869
+    "CMEX-107": "8869",  // Producto: 8869
+    "CMEX-108": "8869",  // Producto: 8869
+    "CMEX-109": "8869",  // Producto: 8869
+    "CMEX-110": "8869",  // Producto: 8869
+    "CMEX-111": "8869",  // Producto: 8869
+    "CMEX-112": "8869",  // Producto: 8869
+    "CMEX-113": "8101",  // Producto: 8101
+    "CMEX-114": "8101",  // Producto: 8101
+    "CMEX-115": "8101",  // Producto: 8101
+    "CMEX-116": "8101",  // Producto: 8101
+    "CMEX-117": "8101",  // Producto: 8101
+    "CMEX-118": "8101",  // Producto: 8101
+    "CMEX-119": "8101",  // Producto: 8101
+    "CMEX-120": "8101",  // Producto: 8101
+    "CMEX-121": "8101",  // Producto: 8101
+    "CMEX-122": "8101",  // Producto: 8101
+    "CMEX-123": "8002",  // Producto: 8002
+    "CMEX-124": "8002",  // Producto: 8002
+    "CMEX-125": "8002",  // Producto: 8002
+    "CMEX-126": "8002",  // Producto: 8002
+    "CMEX-127": "8002",  // Producto: 8002
+    "CMEX-128": "8002",  // Producto: 8002
+    "CMEX-129": "8002",  // Producto: 8002
+    "CMEX-130": "8002",  // Producto: 8002
+    "CMEX-131": "8002",  // Producto: 8002
+    "CMEX-132": "8002",  // Producto: 8002
+    "CMEX-133": "005",  // Producto: 005
+    "CMEX-134": "005",  // Producto: 005
+    "CMEX-135": "005",  // Producto: 005
+    "CMEX-136": "005",  // Producto: 005
+    "CMEX-137": "005",  // Producto: 005
+    "CMEX-138": "005",  // Producto: 005
+    "CMEX-139": "005",  // Producto: 005
+    "CMEX-140": "005",  // Producto: 005
+    "CMEX-141": "005",  // Producto: 005
+    "CMEX-142": "005"  // Producto: 005
 };
 
-const imageMapping = {};
 
 
         // ============================================
